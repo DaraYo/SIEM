@@ -5,14 +5,14 @@ import traceback
 import time
 from random import randint
 from datetime import datetime
-
-
+from datetime import timezone
+from datetime import timedelta
 # ----------------------------------------------------------------------
 def generateAllEvents(server, logtypes, basePath):
     """
     """
     min=0
-    max=60
+    max=10
     if not server:
         serverName = "localhost"
     else:
@@ -61,7 +61,7 @@ def generateEventLogs(server, logtype, logPath):
     severity = randint(0,7)
     pri= (facility*8)+ severity
 
-    the_time= str(datetime.now())
+    the_time= (datetime.now(tz=timezone(timedelta(minutes=120)))).isoformat(timespec="microseconds")
     numbOfMess= randint(0, len(messages)-1)
     if(numbOfMess<=10):
         source=apps[1]
