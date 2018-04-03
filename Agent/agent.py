@@ -1,7 +1,7 @@
 import glob
 import requests
 def main():
-    CIA = "https://localhost:8000"
+    centralAgent = "https://localhost:8000"
 
     f = open("config.config", "r")
     logs_directorium_list = f.readlines()
@@ -23,7 +23,12 @@ def main():
                 VERSION=PRIVERS[1]
                 FACILITY=eval(PRI)//20
                 SEVERITY=eval(PRI)%20
-                TIMESTAMP = parts[1]
+				timestamp = parts[1]
+				if(timestamp!='NILVALUE'):
+					if timestamp[-1]=='Z':
+						timestamp = timestamp[:-1] + '+0000'
+					else:
+						timestamp = timestamp[:-6] + timestamp[-6:].replace(':','')
                 HOSTNAME = parts[2]
                 APPNAME = parts[3]
                 PROCID = parts[4]
@@ -43,7 +48,7 @@ def main():
                        MSG=MSG+" "+DATA[i]
                 MSG=MSG.strip()
                 payload={'facility':FACILITY,'severity':SEVERITY,'version':VERSION,'timestamp':TIMESTAMP,'hostname':HOSTNAME,'appname':APPNAME,'procid':PROCID,'msgid':MSGID,'structuredData':SDATA,'msg':MSG}
-                requests.post(CIA,data=payload)
+                requests.post(centralAgent,data=payload)
     print(messages_dict)
     while True:
         for ldl in logs_directorium_list:
@@ -61,7 +66,12 @@ def main():
                         VERSION=PRIVERS[1]
                         FACILITY=eval(PRI)//20
                         SEVERITY=eval(PRI)%20
-                        TIMESTAMP = parts[1]
+                        timestamp = parts[1]
+						if(timestamp!='NILVALUE'):
+							if timestamp[-1]=='Z':
+								timestamp = timestamp[:-1] + '+0000'
+							else:
+								timestamp = timestamp[:-6] + timestamp[-6:].replace(':','')
                         HOSTNAME = parts[2]
                         APPNAME = parts[3]
                         PROCID = parts[4]
@@ -80,10 +90,9 @@ def main():
                             for i in range(1,len(DATA)):
                                MSG=MSG+" "+DATA[i]
                         MSG=MSG.strip()
-                        payload={'facility':FACILITY,'severity':SEVERITY,'version':VERSION,'timestamp':TIMESTAMP,'hostname':HOSTNAME,'appname':APPNAME,'procid':PROCID,'msgid':MSGID,'structuredData':SDATA,'msg':MSG}
-                        requests.post(CIA,data=payload)
+                        payload={'facility':FACILITY,'severity':SEVERITY,'version':VERSION,'timestamp':timestamp,'hostname':HOSTNAME,'appname':APPNAME,'procid':PROCID,'msgid':MSGID,'structuredData':SDATA,'msg':MSG}
+                        requests.post(centralAgent,data=payload)
     
 if __name__=="__main__":
     main()
 
-        

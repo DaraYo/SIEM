@@ -16,12 +16,7 @@ def log(request):
 	severity = int(request.POST.get('severity'))
 	version = int(request.POST.get('version'))
 	timestamp = request.POST.get('timestamp')
-	#Potrebno prebaciti na klijente
-	if timestamp[-1]=='Z':
-		timestamp = timestamp[:-1] + '+0000'
-	else:
-		timestamp = timestamp[:-6] + timestamp[-6:].replace(':','')
-	#do ovde
+
 	if(timestamp!='NILVALUE'):
 		timestamp = datetime.strptime(timestamp,'%Y-%m-%dT%H:%M:%S.%f%z')
 	else:
