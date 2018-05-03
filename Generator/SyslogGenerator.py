@@ -85,4 +85,4 @@ if __name__ == "__main__":
     server = None  # None = local machine
     #logTypes = ["System", "Application", "Security"]#, "Setup", "Forwarded"]
     logTypes= ["First", "Second", "Third"]
-    generateAllEvents(server, logTypes, "C:")
+    generateAllEvents(server, logTypes, "E:\FAKS\MMM\project\git\SIEM\Generator")

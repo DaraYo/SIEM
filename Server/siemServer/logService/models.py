@@ -12,3 +12,15 @@ class Log(models.Model):
 	msgid = models.CharField(max_length=50)
 	structuredData = models.TextField()
 	msg = models.TextField()
+
+class Machine(models.Model):
+	WINDOWS = 'W'
+	LINUX = 'L'
+	OS_CHOICES = (
+		(WINDOWS, 'Windows'),
+		(LINUX, 'Linux')
+	)
+	ip = models.CharField(max_length=45)
+	system = models.CharField(max_length=1, choices = OS_CHOICES)
+	counter = models.BigIntegerField()
+	

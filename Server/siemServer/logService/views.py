@@ -12,25 +12,25 @@ def log(request):
 	#add protections first
 	#REMOTE_ADDR in list of adress
 	response = HttpResponse()
-	facility = int(request.POST.get('facility'))
-	severity = int(request.POST.get('severity'))
-	version = int(request.POST.get('version'))
-	timestamp = request.POST.get('timestamp')
-
-	if(timestamp!='NILVALUE'):
-		timestamp = datetime.strptime(timestamp,'%Y-%m-%dT%H:%M:%S.%f%z')
-	else:
-		timestamp = None
-	hostname = request.POST.get('hostname')
-	appname = request.POST.get('appname')
-	procid = request.POST.get('procid')
-	msgid = request.POST.get('msgid')
-	structuredData = request.POST.get('structuredData')
-	msg = request.POST.get('msg')
+	facilityList = request.POST.get('facility')
+	severityList = request.POST.get('severity')
+	versionList = request.POST.get('version')
+	timestampList = request.POST.get('timestamp')
+	hostnameList = request.POST.get('hostname')
+	appnameList = request.POST.get('appname')
+	procidList = request.POST.get('procid')
+	msgidList = request.POST.get('msgid')
+	structuredDataList = request.POST.get('structuredData')
+	msgList = request.POST.get('msg')
 	try:
-		logs = Log.objects.create(facility=facility,severity=severity,version=version,
-		timestamp=timestamp,hostname=hostname,appname=appname,procid=procid,msgid=msgid,
-		structuredData=structuredData,msg=msg)
+		for i in range(0,len(facilityList)):
+			if(timestampList[i]!='NILVALUE'):
+				timestampList[i] = datetime.strptime(timestampList[i],'%Y-%m-%dT%H:%M:%S.%f%z')
+			else:
+				timestampList[i] = None
+			logs = Log.objects.create(facility=int(facilityList[i]),severity=int(severityList[i]),version=int(versionList[i]),
+			timestamp=timestampList[i],hostname=hostnameList[i],appname=appnameList[i],procid=procidList[i],msgid=msgidList[i],
+			structuredData=structuredDataList[i],msg=msgList[i])
 		logs.save()
 		response.status_code = 200
 		return response
