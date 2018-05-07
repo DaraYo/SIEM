@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Alarm Logs</title>
+</head>
+<body>
+    {% if alarms %}
+        <table>
+            <tr>
+                <th>Alarm</th>
+                <th>Time</th>
+                <th>Machine</th>
+				<th>Seen</th>
+            </tr>
+        {% for alarm in alarms %}
+            <tr>
+                <td>{{ alarm.alarm }}</td>
+				<td>{{ alarm.time }}</td>
+				<td>{{ alarm.machine }}</td>
+				<td>{{ alarm.seen }}</td>
+
+            </tr>
+        {% endfor %}
+        </table>
+        <form action="#" method="get">
+            <input type="text" name="version"/>
+            <input type="text" name="msgId"/>
+            <input type="text" name="msg"/>
+            <input type="submit" class="btn" value="Click" name="search">
+        </form>
+    {% else %}
+        <p>No logs are available.</p>
+    {% endif %}
+</body>
+</html>

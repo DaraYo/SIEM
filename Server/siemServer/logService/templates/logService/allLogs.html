@@ -8,15 +8,30 @@
     {% if logs %}
         <table>
             <tr>
-                <th>Version of log</th>
-                <th>Message Id</th>
-                <th>Message</th>
+                <th>Facility</th>
+                <th>Severity</th>
+                <th>Version</th>
+				<th>Time stamp</th>
+				<th>Host name</th>
+				<th>App name</th>
+				<th>Proc ID</th>
+				<th>Message ID</th>
+				<th>Structured Data</th>
+				<th>Message</th>
             </tr>
         {% for log in logs %}
             <tr>
-                <td>{{ log.version }}</td>
-                <td>{{ log.msgIdList }}</td>
-                <td>{{ log.msgList }}</td>
+                <td>{{ log.facility }}</td>
+				<td>{{ log.severity }}</td>                
+				<td>{{ log.version }}</td>
+				<td>{{ log.timestamp }}</td>
+				<td>{{ log.hostname }}</td>
+				<td>{{ log.appname }}</td>
+				<td>{{ log.procid }}</td>
+				<td>{{ log.msgid }}</td>
+				<td>{{ log.structuredData }}</td>
+				<td>{{ log.msg }}</td>
+
             </tr>
         {% endfor %}
         </table>
