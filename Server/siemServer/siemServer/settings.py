@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-	'logService'
+	'logService',
+    'alarmService'
 ]
 
 MIDDLEWARE = [
@@ -120,3 +121,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+#SECURE_PROXY_SSL_HEADER= ('HTTP_X_FORWARDED_PROTO', 'https')
+#SECURE_SSL_REDIRECT= True
+#SESSION_COOKIE_SECURE= True
+#CSRF_COOKIE_SECURE= True
+#SECURE_HSTS_INCLUDE_SUBDOMAINS= True

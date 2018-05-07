@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Logs</title>
+</head>
+<body>
+    {% if logs %}
+        <table>
+            <tr>
+                <th>Version of log</th>
+                <th>Message Id</th>
+                <th>Message</th>
+            </tr>
+        {% for log in logs %}
+            <tr>
+                <td>{{ log.version }}</td>
+                <td>{{ log.msgIdList }}</td>
+                <td>{{ log.msgList }}</td>
+            </tr>
+        {% endfor %}
+        </table>
+        <form action="#" method="get">
+            <input type="text" name="version"/>
+            <input type="text" name="msgId"/>
+            <input type="text" name="msg"/>
+            <input type="submit" class="btn" value="Click" name="search">
+        </form>
+    {% else %}
+        <p>No logs are available.</p>
+    {% endif %}
+</body>
+</html>
