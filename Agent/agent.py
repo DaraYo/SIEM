@@ -60,8 +60,8 @@ def main():
 							PRIVERS = parts[0].split(">")
 							PRI = PRIVERS[0].split("<")[1]
 							VERSION=PRIVERS[1]
-							FACILITY=eval(PRI)//20
-							SEVERITY=eval(PRI)%20
+							FACILITY=eval(PRI)//8
+							SEVERITY=eval(PRI)%8
 							timestamp = parts[1]
 							if(timestamp!='NILVALUE'):
 								if timestamp[-1]=='Z':
