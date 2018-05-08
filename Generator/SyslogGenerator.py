@@ -1,88 +1,335 @@
-import codecs
+import random
+import socket
 import os
-import sys
-import traceback
-import time
-from random import randint
-from datetime import datetime
-from datetime import timezone
-from datetime import timedelta
-# ----------------------------------------------------------------------
-def generateAllEvents(server, logtypes, basePath):
-    """
-    """
-    min=0
-    max=10
-    if not server:
-        serverName = "localhost"
-    else:
-        serverName = server
-    loop_value= True
-    while loop_value:
-        logtype= logtypes[randint(0, len(logtypes)-1)]
-        path = os.path.join(basePath, "%s_%s_log.log" % (serverName, logtype))
-        generateEventLogs(serverName, logtype, path)
-        time.sleep(randint(min,max))
-# ----------------------------------------------------------------------
+from collections import Counter
+from time import sleep,strftime,localtime
 
-def generateEventLogs(server, logtype, logPath):
-    messages=[
-        "An account was logged off.", #1
-        "An account was successfully logged on.", #1
-        "Special privileges assigned to new logon.",#1
-        "A user account was changed.", #1
-        "A user's local group membership was enumerated.", #1
-        "A security-enabled local group membership was enumerated.", #1
-        "An attempt was made to query the existence of a blank password for an account.", #1
-        "A logon was attempted using explicit credentials.", #1
-        "Cryptographic operation.", #1
-        "Key migration operation.", #1
-        "Key file operation.", #1
-        "The system has returned from a low power state."  # 2 information type
-        "A service was installed in the system.", #3 information
-        "-",
-        "Installation successful.",  # 4 information
-        "Started downloading an update."  # 4 information
-    ]
+NOOFUSERS = 1
 
-    apps=[
-        "Microsoft-Windows-WindowsUpdateClient",#4
-        "Microsoft-Windows-Security-Auditing", #1
-        "Microsoft-Windows-Power-Troubleshooter", #2
-        "Service Control Manager" #3
-    ]
+FREQUENCY = {'min': 10,'max':15}#time in secounds
+USERSPEED = {'min': 1,'max':5}#time in secounds
 
+MINFUNCTIONS = 0
+MAXFUNCTIONS = 10
 
-    numb_of_logs= randint(0,15)
-    print ("Logging %s events" % logtype)
-    log = codecs.open(logPath, encoding='utf-8', mode='a')
+DOCCHANCE = Counter(A=170,B=100,C=130,D=120,E=100,F=50,G=25,H=25,I=50,J=100,K=5,L=5,M=5,N=5,O=5,P=5,Q=75,R=25)#1000 total
+ADMINCHANCE = Counter(A=10,B=10,C=10,D=10,E=10,F=10,G=10,H=10,I=10,J=10,K=200,L=100,M=100,N=200,O=150,P=150,Q=0,R=0)#1000 total
+UNREGCHANCE = Counter(A=10,B=10,C=10,D=10,E=10,F=10,G=10,H=10,I=10,J=10,K=10,L=10,M=10,N=10,O=10,P=10,Q=420,R=420)#1000 total
 
-    facility = randint(0, 23)
-    severity = randint(0,7)
-    pri= (facility*8)+ severity
+FAILCHANCE = Counter(Emergency=1,Alert=3,Critical=3,Error=5,Warning=13,Notice=75)
+LOGINCHANCE = Counter(S=80,F=20)
 
-    the_time= (datetime.now(tz=timezone(timedelta(minutes=120)))).isoformat(timespec="microseconds")
-    numbOfMess= randint(0, len(messages)-1)
-    if(numbOfMess<=10):
-        source=apps[1]
-    if(numbOfMess==11):
-        source=apps[2]
-    if(numbOfMess==12):
-        source=apps[3]
-    if(numbOfMess==13):
-        source= apps[randint(0, len(apps))]
-    if(numbOfMess>13):
-        source= apps[0]
-    msg= messages[numbOfMess]
-    counter= randint(0,100)
-    log.write("<%s>1 %s %s %s - ID%s - %s\n" % (pri, the_time, server, source, counter, msg))
-    log.close()
+DEST_LOGIN = "./Services/authLog.txt"
 
-    print
-    "Log creation finished. Location of log is %s" % logPath
+DEST_MAIL = "./Services/mailLog.txt"
 
-if __name__ == "__main__":
-    server = None  # None = local machine
-    #logTypes = ["System", "Application", "Security"]#, "Setup", "Forwarded"]
-    logTypes= ["First", "Second", "Third"]
-    generateAllEvents(server, logTypes, "")
+DEST_WIKI = "./Wiki/log.txt"
+
+DEST_APP = "./App/appLog.txt"
+
+DEST_DB = "./App/dbLog.txt"
+
+DEST_INSTRUMENT = "./Services/machineLog.txt"
+
+def getUser():
+	return random.choice(['a','d','u'])
+	
+def getRandom(chanceCounter):
+	chanceList = sorted(chanceCounter.elements())
+	random.shuffle(chanceList)
+	index = random.randint(0,len(chanceList)-1)
+	return chanceList[index]
+
+def writeLog(path,facility,severity,msgid,sdata,msg):
+	version = 1
+	timestamp = localtime()
+	timestamp = strftime('%Y-%m-%dT%H:%M:%S.00%z', timestamp)
+	hostname = socket.gethostname()
+	appname = "app-sim"
+	procid = '-'
+	
+	num = facility*8 + severity
+	
+	string = "<" + str(num) + ">"+str(version)+" "+ timestamp + " " + hostname + " " + appname + " " + procid + " " + msgid + " " + sdata + " " + msg + "\n"
+	
+	file = open(path,'a')
+	file.write(string)
+	file.close()
+	
+def simulateUserAction():
+	userChance = {'a':ADMINCHANCE, 'd':DOCCHANCE, 'u':UNREGCHANCE}
+	userType = getUser()
+	print(userType)
+	userChance = userChance[userType]
+	if userType=='d':
+		start_shift()
+	for userFunctionIndex in range(0,random.randint(MINFUNCTIONS-1,MAXFUNCTIONS)):
+		sleep(random.randint(USERSPEED['min'],USERSPEED['max']))
+		FUNCTIONS[getRandom(userChance)](userType)
+		print("action done")
+	if userType=='d':
+		end_shift()
+		
+		
+def main():
+	app = DEST_APP.split("/")[:-1]
+	db = DEST_DB.split("/")[:-1]
+	inst = DEST_INSTRUMENT.split("/")[:-1]
+	log = DEST_LOGIN.split("/")[:-1]
+	mail = DEST_MAIL.split("/")[:-1]
+	wiki = DEST_WIKI.split("/")[:-1]
+	for a in [app,db,inst,log,mail,wiki]:
+		path = '/'.join(a)
+		try:
+			os.mkdir(path)
+		except:
+			pass
+	for i in range(0,NOOFUSERS):
+		simulateUserAction()
+		sleep(random.randint(FREQUENCY['min'],FREQUENCY['max']))
+		
+#20 functions
+#users docs, admin, unreg
+
+#login
+def loginCheck():
+	return getRandom(LOGINCHANCE)
+	
+def login(userType):
+	if(userType=='u'):
+		return
+	while True:
+		if loginCheck()=='S':
+			writeLog(DEST_DB,23,6,"authenticate","-","Authentication confirmed")
+			writeLog(DEST_LOGIN,4,6,"user"+userType,"-","User successfully loged in")
+			return
+		else:
+			writeLog(DEST_DB,23,5,"authenticate","-","Authentication faild")
+			writeLog(DEST_LOGIN,4,5,"user"+userType,"-","User faild to log in")
+
+#DOC
+def start_shift():
+	type = random.choice(['general','surgeon','nurse'])
+	type2 = random.choice(['general','surgeon','nurse'])
+	if getRandom(FAILCHANCE)!="Notice":
+		writeLog(DEST_APP,16,4,"-",'[userData@32473 job="'+type2+'"]',"Previous user faild to end job, forcefully ending")
+		writeLog(DEST_APP,16,6,"-","-","User ended daily job")
+		writeLog(DEST_APP,16,6,type,"-","User started daily job")
+	else:
+		writeLog(DEST_APP,16,6,type,"-","User started daily job")
+	
+def end_shift():
+	writeLog(DEST_APP,16,6,"-","-","User ended daily job")
+
+def get_patient_data(userType):
+	if(userType!='d'):
+		writeLog(DEST_APP,20,4,"unauthorized",'[invalidData@32473 user="'+userType+'"]',"Unauthorized request to get patient data")
+		return
+	doc = random.choice(['malcom','andy','maya'])
+	writeLog(DEST_DB,23,6,"get","-","Patient data requested")
+	if getRandom(FAILCHANCE)!="Notice":
+		writeLog(DEST_APP,17,1,doc,"-","Patient data not found")
+		writeLog(DEST_MAIL,2,5,"new_patient","-","Email sent to admin")
+	else:
+		writeLog(DEST_APP,17,6,doc,"-","Patient data aquired")
+		
+def print_info(userType):
+	if(userType!='d'):
+		writeLog(DEST_APP,20,4,"unauthorized",'[invalidData@32473 user="'+userType+'"]',"Unauthorized request to print data")
+		return
+	state = getRandom(FAILCHANCE)
+	if state!="Notice":
+		if state!="Warning":
+			writeLog(DEST_APP,17,6,'printer',"-","Print request sent")
+			writeLog(DEST_INSTRUMENT,6,1,'printer',"-","Printer stoped working")
+			writeLog(DEST_MAIL,2,5,"critical","-","Email sent to admin")
+			writeLog(DEST_APP,17,1,'printer',"-","Printer is not working")
+		else:
+			writeLog(DEST_APP,17,6,'printer',"-","Print request sent")
+			writeLog(DEST_INSTRUMENT,6,5,'printer','-',"Print request on wait")
+			sleep(2)
+			writeLog(DEST_INSTRUMENT,6,6,'printer','-','Data printed')
+	else:
+		writeLog(DEST_APP,17,6,'printer',"-","Print request sent")
+		writeLog(DEST_INSTRUMENT,6,6,'printer','-','Data printed')
+		
+def set_appointment(userType):
+	if(userType!='d'):
+		writeLog(DEST_APP,20,4,"unauthorized",'[invalidData@32473 user="'+userType+'"]',"Unauthorized request to set appointment")
+		return
+	doc = random.choice(['malcom','andy','maya'])
+	state = getRandom(FAILCHANCE)
+	if(state!="Notice"):
+		if(state=="Warning"):
+			writeLog(DEST_DB,23,6,"insert","-","Created new appointment")
+			writeLog(DEST_APP,17,6,doc,"-","New appointment set")
+			writeLog(DEST_APP,17,4,doc,"-","Maximal amount of appointments reached for a day")
+		else:
+			writeLog(DEST_APP,17,3,doc,"-","Maximal amount of appointments already reached, faild to create appointment")
+	else:
+		writeLog(DEST_DB,23,6,"insert","-","Created new appointment")
+		writeLog(DEST_APP,17,6,doc,"-","New appointment set")
+		
+def give_prescription(userType):
+	if(userType!='d'):
+		writeLog(DEST_APP,20,4,"unauthorized",'[invalidData@32473 user="'+userType+'"]',"Unauthorized request to print data")
+		return
+	if getRandom(FAILCHANCE)!="Notice":
+		#WRITE WARNING/ERROR SOMEONE ALREADY AT WORK, TERMINATED
+		pass
+	else:
+		#WRITE LOG
+		pass
+		
+def update_patient_data(userType):
+	if(userType!='d'):
+		writeLog(DEST_APP,20,4,"unauthorized",'[invalidData@32473 user="'+userType+'"]',"Unauthorized request to print data")
+		return
+	if getRandom(FAILCHANCE)!="Notice":
+		#WRITE WARNING/ERROR SOMEONE ALREADY AT WORK, TERMINATED
+		pass
+	else:
+		#WRITE LOG
+		pass
+		
+def reserve_operation_room(userType):
+	if(userType!='d'):
+		writeLog(DEST_APP,20,4,"unauthorized",'[invalidData@32473 user="'+userType+'"]',"Unauthorized request to print data")
+		return
+	if getRandom(FAILCHANCE)!="Notice":
+		#WRITE WARNING/ERROR SOMEONE ALREADY AT WORK, TERMINATED
+		pass
+	else:
+		#WRITE LOG
+		pass
+		
+def alert_area(userType):
+	if(userType!='d'):
+		writeLog(DEST_APP,20,4,"unauthorized",'[invalidData@32473 user="'+userType+'"]',"Unauthorized request to print data")
+		return
+	if getRandom(FAILCHANCE)!="Notice":
+		#WRITE WARNING/ERROR SOMEONE ALREADY AT WORK, TERMINATED
+		pass
+	else:
+		#WRITE LOG
+		pass
+		
+def request_transport_for_patient(userType):
+	if(userType!='d'):
+		writeLog(DEST_APP,20,4,"unauthorized",'[invalidData@32473 user="'+userType+'"]',"Unauthorized request to print data")
+		return
+	if getRandom(FAILCHANCE)!="Notice":
+		#WRITE WARNING/ERROR SOMEONE ALREADY AT WORK, TERMINATED
+		pass
+	else:
+		#WRITE LOG
+		pass
+		
+def comunicate(userType):
+	if(userType!='d'):
+		writeLog(DEST_APP,20,4,"unauthorized",'[invalidData@32473 user="'+userType+'"]',"Unauthorized request to print data")
+		return
+	if getRandom(FAILCHANCE)!="Notice":
+		#WRITE WARNING/ERROR SOMEONE ALREADY AT WORK, TERMINATED
+		pass
+	else:
+		#WRITE LOG
+		pass
+		
+def read_announcements(userType):
+	if(userType!='d'):
+		writeLog(DEST_APP,20,4,"unauthorized",'[invalidData@32473 user="'+userType+'"]',"Unauthorized request to print data")
+		return
+	if getRandom(FAILCHANCE)!="Notice":
+		#WRITE WARNING/ERROR SOMEONE ALREADY AT WORK, TERMINATED
+		pass
+	else:
+		#WRITE LOG
+		pass
+
+#ADMIN
+def add_announcements(userType):
+	if(userType!='a'):
+		writeLog(DEST_APP,20,4,"unauthorized",'[invalidData@32473 user="'+userType+'"]',"Unauthorized request to print data")
+		return
+	if getRandom(FAILCHANCE)!="Notice":
+		#WRITE WARNING/ERROR SOMEONE ALREADY AT WORK, TERMINATED
+		pass
+	else:
+		#WRITE LOG
+		pass
+
+def register_doc(userType):
+	if(userType!='a'):
+		writeLog(DEST_APP,20,4,"unauthorized",'[invalidData@32473 user="'+userType+'"]',"Unauthorized request to print data")
+		return
+	if getRandom(FAILCHANCE)!="Notice":
+		#WRITE WARNING/ERROR SOMEONE ALREADY AT WORK, TERMINATED
+		pass
+	else:
+		#WRITE LOG
+		pass
+		
+def remove_doc(userType):
+	if(userType!='a'):
+		writeLog(DEST_APP,20,4,"unauthorized",'[invalidData@32473 user="'+userType+'"]',"Unauthorized request to print data")
+		return
+	if getRandom(FAILCHANCE)!="Notice":
+		#WRITE WARNING/ERROR SOMEONE ALREADY AT WORK, TERMINATED
+		pass
+	else:
+		#WRITE LOG
+		pass
+def set_schedule(userType):
+	if(userType!='a'):
+		writeLog(DEST_APP,20,4,"unauthorized",'[invalidData@32473 user="'+userType+'"]',"Unauthorized request to print data")
+		return
+	if getRandom(FAILCHANCE)!="Notice":
+		#WRITE WARNING/ERROR SOMEONE ALREADY AT WORK, TERMINATED
+		pass
+	else:
+		#WRITE LOG
+		pass
+		
+def edit_wiki(userType):
+	if(userType!='a'):
+		writeLog(DEST_APP,20,4,"unauthorized",'[invalidData@32473 user="'+userType+'"]',"Unauthorized request to print data")
+		return
+	if getRandom(FAILCHANCE)!="Notice":
+		#WRITE WARNING/ERROR SOMEONE ALREADY AT WORK, TERMINATED
+		pass
+	else:
+		#WRITE LOG
+		pass
+		
+def add_patient_data(userType):
+	if(userType!='a'):
+		writeLog(DEST_APP,20,4,"unauthorized",'[invalidData@32473 user="'+userType+'"]',"Unauthorized request to print data")
+		return
+	if getRandom(FAILCHANCE)!="Notice":
+		#WRITE WARNING/ERROR SOMEONE ALREADY AT WORK, TERMINATED
+		pass
+	else:
+		#WRITE LOG
+		pass
+
+#UNREG
+def read_wiki(userType):
+	if getRandom(FAILCHANCE)!="Notice":
+		#WRITE WARNING/ERROR SOMEONE ALREADY AT WORK, TERMINATED
+		pass
+	else:
+		#WRITE LOG
+		pass
+		
+def chec_schedule(userType):
+	if getRandom(FAILCHANCE)!="Notice":
+		#WRITE WARNING/ERROR SOMEONE ALREADY AT WORK, TERMINATED
+		pass
+	else:
+		#WRITE LOG
+		pass
+
+FUNCTIONS = {'A':get_patient_data,'B':print_info,'C':set_appointment,'D':give_prescription,'E':update_patient_data,'F':reserve_operation_room,'G':alert_area,'H':request_transport_for_patient,'I':comunicate,'J':read_announcements,'K':add_announcements,'L':register_doc,'M':remove_doc,'N':set_schedule,'O':edit_wiki,'P':add_patient_data,'Q':read_wiki,'R':chec_schedule}
+		
+main()
