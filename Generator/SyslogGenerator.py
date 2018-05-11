@@ -19,17 +19,17 @@ UNREGCHANCE = Counter(A=10,B=10,C=10,D=10,E=10,F=10,G=10,H=10,I=10,J=10,K=10,L=1
 FAILCHANCE = Counter(Emergency=1,Alert=3,Critical=3,Error=5,Warning=13,Notice=75)
 LOGINCHANCE = Counter(S=80,F=20)
 
-DEST_LOGIN = "./Services/authLog.txt"
+DEST_LOGIN = "./Services/authLog.log"
 
-DEST_MAIL = "./Services/mailLog.txt"
+DEST_MAIL = "./Services/mailLog.log"
 
-DEST_WIKI = "./Wiki/log.txt"
+DEST_WIKI = "./Wiki/log.log"
 
-DEST_APP = "./App/appLog.txt"
+DEST_APP = "./App/appLog.log"
 
-DEST_DB = "./App/dbLog.txt"
+DEST_DB = "./App/dbLog.log"
 
-DEST_INSTRUMENT = "./Services/machineLog.txt"
+DEST_INSTRUMENT = "./Services/machineLog.log"
 
 def getUser():
 	return random.choice(['a','d','u'])
@@ -59,14 +59,15 @@ def writeLog(path,facility,severity,msgid,sdata,msg):
 def simulateUserAction():
 	userChance = {'a':ADMINCHANCE, 'd':DOCCHANCE, 'u':UNREGCHANCE}
 	userType = getUser()
-	print(userType)
+	print("User type: " + userType)
 	userChance = userChance[userType]
 	if userType=='d':
 		start_shift()
 	for userFunctionIndex in range(0,random.randint(MINFUNCTIONS-1,MAXFUNCTIONS)):
+		print("Action started")
 		sleep(random.randint(USERSPEED['min'],USERSPEED['max']))
 		FUNCTIONS[getRandom(userChance)](userType)
-		print("action done")
+		print("Action done")
 	if userType=='d':
 		end_shift()
 		
@@ -85,6 +86,7 @@ def main():
 		except:
 			pass
 	for i in range(0,NOOFUSERS):
+		print("======== User no: "+(str(i+1))+" ==========")
 		simulateUserAction()
 		sleep(random.randint(FREQUENCY['min'],FREQUENCY['max']))
 		
@@ -171,164 +173,144 @@ def set_appointment(userType):
 		writeLog(DEST_APP,17,6,doc,"-","New appointment set")
 		
 def give_prescription(userType):
+	doc = random.choice(['malcom','andy','maya'])
+	state = getRandom(FAILCHANCE)
 	if(userType!='d'):
 		writeLog(DEST_APP,20,4,"unauthorized",'[invalidData@32473 user="'+userType+'"]',"Unauthorized request to print data")
 		return
-	if getRandom(FAILCHANCE)!="Notice":
-		#WRITE WARNING/ERROR SOMEONE ALREADY AT WORK, TERMINATED
-		pass
+	if state!="Notice":
+		writeLog(DEST_APP,17,4,doc,"-","Patient is alergin to prescription, aborted by app")
 	else:
-		#WRITE LOG
-		pass
+		writeLog(DEST_DB,23,6,"insert","-","Created new prescription")
+		writeLog(DEST_APP,17,6,doc,"-","Prescription given out")
+		writeLog(DEST_APP,17,6,'printer',"-","Print prescription request sent")
+		writeLog(DEST_INSTRUMENT,6,6,'printer','-','Prescription printed')
+	
 		
 def update_patient_data(userType):
 	if(userType!='d'):
 		writeLog(DEST_APP,20,4,"unauthorized",'[invalidData@32473 user="'+userType+'"]',"Unauthorized request to print data")
 		return
-	if getRandom(FAILCHANCE)!="Notice":
-		#WRITE WARNING/ERROR SOMEONE ALREADY AT WORK, TERMINATED
-		pass
-	else:
-		#WRITE LOG
-		pass
+	doc = random.choice(['malcom','andy','maya'])
+	writeLog(DEST_DB,23,6,"update","-","Patient data updated")
+	writeLog(DEST_APP,17,6,doc,"-","Patient data updated")
+	
+	
 		
 def reserve_operation_room(userType):
 	if(userType!='d'):
 		writeLog(DEST_APP,20,4,"unauthorized",'[invalidData@32473 user="'+userType+'"]',"Unauthorized request to print data")
 		return
+	doc = random.choice(['malcom','andy','maya'])
 	if getRandom(FAILCHANCE)!="Notice":
-		#WRITE WARNING/ERROR SOMEONE ALREADY AT WORK, TERMINATED
-		pass
+		writeLog(DEST_APP,17,1,doc,"-","Operatioinal rooms full")
 	else:
-		#WRITE LOG
-		pass
+		writeLog(DEST_MAIL,2,5,"reservation","-","Email sent to organiser")
+		writeLog(DEST_APP,17,6,doc,"-","Operational room reserved")
 		
 def alert_area(userType):
 	if(userType!='d'):
 		writeLog(DEST_APP,20,4,"unauthorized",'[invalidData@32473 user="'+userType+'"]',"Unauthorized request to print data")
 		return
 	if getRandom(FAILCHANCE)!="Notice":
-		#WRITE WARNING/ERROR SOMEONE ALREADY AT WORK, TERMINATED
-		pass
+		writeLog(DEST_INSTRUMENT,6,1,'alert','-','Alarm bell not working')
 	else:
-		#WRITE LOG
-		pass
+		writeLog(DEST_MAIL,2,1,"alert","-","Email sent to doctors")
+		writeLog(DEST_APP,17,1,"alert","-","Area alert trigered")
+		writeLog(DEST_INSTRUMENT,6,1,'alert','-','Alarm bell was triggered')
 		
 def request_transport_for_patient(userType):
 	if(userType!='d'):
 		writeLog(DEST_APP,20,4,"unauthorized",'[invalidData@32473 user="'+userType+'"]',"Unauthorized request to print data")
 		return
-	if getRandom(FAILCHANCE)!="Notice":
-		#WRITE WARNING/ERROR SOMEONE ALREADY AT WORK, TERMINATED
-		pass
-	else:
-		#WRITE LOG
-		pass
+	doc = random.choice(['malcom','andy','maya'])
+	writeLog(DEST_MAIL,2,5,"transport","-","Email sent requesting transport")
+	writeLog(DEST_APP,17,5,doc,"-","Transport request sent")
 		
 def comunicate(userType):
 	if(userType!='d'):
 		writeLog(DEST_APP,20,4,"unauthorized",'[invalidData@32473 user="'+userType+'"]',"Unauthorized request to print data")
 		return
 	if getRandom(FAILCHANCE)!="Notice":
-		#WRITE WARNING/ERROR SOMEONE ALREADY AT WORK, TERMINATED
-		pass
+		writeLog(DEST_MAIL,2,3,"comunication","-","Email faild to be sent, service down")
+		writeLog(DEST_MAIL,2,7,"comunication","-","Debug: Mail server error at:...")
 	else:
-		#WRITE LOG
-		pass
+		writeLog(DEST_MAIL,2,6,"comunication","-","Email sent requesting transport")
+
 		
 def read_announcements(userType):
 	if(userType!='d'):
 		writeLog(DEST_APP,20,4,"unauthorized",'[invalidData@32473 user="'+userType+'"]',"Unauthorized request to print data")
 		return
-	if getRandom(FAILCHANCE)!="Notice":
-		#WRITE WARNING/ERROR SOMEONE ALREADY AT WORK, TERMINATED
-		pass
-	else:
-		#WRITE LOG
-		pass
+	writeLog(DEST_DB,23,6,"get","-","Announcement data requested")
+	writeLog(DEST_APP,17,6,"announcement","-","Announcement checked")
 
 #ADMIN
 def add_announcements(userType):
 	if(userType!='a'):
 		writeLog(DEST_APP,20,4,"unauthorized",'[invalidData@32473 user="'+userType+'"]',"Unauthorized request to print data")
 		return
-	if getRandom(FAILCHANCE)!="Notice":
-		#WRITE WARNING/ERROR SOMEONE ALREADY AT WORK, TERMINATED
-		pass
-	else:
-		#WRITE LOG
-		pass
+	writeLog(DEST_DB,23,6,"insert","-","Announcement added")
+	writeLog(DEST_APP,17,6,"announcement","-","Announcement added")
 
 def register_doc(userType):
 	if(userType!='a'):
 		writeLog(DEST_APP,20,4,"unauthorized",'[invalidData@32473 user="'+userType+'"]',"Unauthorized request to print data")
 		return
+	writeLog(DEST_DB,23,6,"insert","-","New doctor registerd")
 	if getRandom(FAILCHANCE)!="Notice":
-		#WRITE WARNING/ERROR SOMEONE ALREADY AT WORK, TERMINATED
-		pass
-	else:
-		#WRITE LOG
-		pass
+		writeLog(DEST_DB,23,4,"insert","-","New doctor has same name as existing one")
+	writeLog(DEST_APP,17,6,"announcement","-","Announcement added")
 		
 def remove_doc(userType):
 	if(userType!='a'):
 		writeLog(DEST_APP,20,4,"unauthorized",'[invalidData@32473 user="'+userType+'"]',"Unauthorized request to print data")
 		return
-	if getRandom(FAILCHANCE)!="Notice":
-		#WRITE WARNING/ERROR SOMEONE ALREADY AT WORK, TERMINATED
-		pass
-	else:
-		#WRITE LOG
-		pass
+	writeLog(DEST_DB,23,5,"delete","-","Doctor removed")
+	writeLog(DEST_APP,17,6,"delete","-","Doctor removed from users")
+	
 def set_schedule(userType):
 	if(userType!='a'):
 		writeLog(DEST_APP,20,4,"unauthorized",'[invalidData@32473 user="'+userType+'"]',"Unauthorized request to print data")
 		return
 	if getRandom(FAILCHANCE)!="Notice":
-		#WRITE WARNING/ERROR SOMEONE ALREADY AT WORK, TERMINATED
-		pass
+		writeLog(DEST_APP,17,3,"schedule","-","Schedule already set for this week")
 	else:
-		#WRITE LOG
-		pass
+		writeLog(DEST_APP,17,6,"schedule","-","Schedule set")
+
 		
 def edit_wiki(userType):
 	if(userType!='a'):
 		writeLog(DEST_APP,20,4,"unauthorized",'[invalidData@32473 user="'+userType+'"]',"Unauthorized request to print data")
 		return
 	if getRandom(FAILCHANCE)!="Notice":
-		#WRITE WARNING/ERROR SOMEONE ALREADY AT WORK, TERMINATED
-		pass
+		writeLog(DEST_WIKI,22,5,"edit","-","Wiki page edited")
 	else:
-		#WRITE LOG
-		pass
+		writeLog(DEST_DB,23,6,"insert","-","New wiki page created")
+		writeLog(DEST_WIKI,22,6,"add","-","Wiki page edited")
 		
 def add_patient_data(userType):
 	if(userType!='a'):
 		writeLog(DEST_APP,20,4,"unauthorized",'[invalidData@32473 user="'+userType+'"]',"Unauthorized request to print data")
 		return
 	if getRandom(FAILCHANCE)!="Notice":
-		#WRITE WARNING/ERROR SOMEONE ALREADY AT WORK, TERMINATED
-		pass
+		writeLog(DEST_DB,23,3,"insert","-","Error inserting in to database")
 	else:
-		#WRITE LOG
-		pass
+		writeLog(DEST_DB,23,6,"insert","-","New patient data created")
+		writeLog(DEST_APP,17,6,"patient","-","New patient data created")
+		writeLog(DEST_MAIL,2,6,"comunication","-","Email information sent")
 
 #UNREG
 def read_wiki(userType):
 	if getRandom(FAILCHANCE)!="Notice":
-		#WRITE WARNING/ERROR SOMEONE ALREADY AT WORK, TERMINATED
-		pass
+		writeLog(DEST_DB,23,6,"get","-","Wiki data requested")
+		writeLog(DEST_WIKI,22,5,"view","-","Nonexistant page requested")
 	else:
-		#WRITE LOG
-		pass
+		writeLog(DEST_DB,23,6,"get","-","Wiki data requested")
+		writeLog(DEST_WIKI,22,6,"view","-","Page request")
 		
 def chec_schedule(userType):
-	if getRandom(FAILCHANCE)!="Notice":
-		#WRITE WARNING/ERROR SOMEONE ALREADY AT WORK, TERMINATED
-		pass
-	else:
-		#WRITE LOG
-		pass
+	writeLog(DEST_APP,17,6,"schedule","-","Schedule checked")
 
 FUNCTIONS = {'A':get_patient_data,'B':print_info,'C':set_appointment,'D':give_prescription,'E':update_patient_data,'F':reserve_operation_room,'G':alert_area,'H':request_transport_for_patient,'I':comunicate,'J':read_announcements,'K':add_announcements,'L':register_doc,'M':remove_doc,'N':set_schedule,'O':edit_wiki,'P':add_patient_data,'Q':read_wiki,'R':chec_schedule}
 		
