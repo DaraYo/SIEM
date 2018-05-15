@@ -1,18 +1,28 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
+from django.contrib.auth.decorators import permission_required,login_required
 
 from datetime import datetime
 
-from .models import Log
+from .models import Log,Machine
 #from alarmService.models import AlarmLog
 
 # Create your views here.
-@csrf_exempt
 def log(request):
-	#add protections first
-	#REMOTE_ADDR in list of adress
-    #alarms= AlarmLog.objects.all()
+	#add protection
+	#whitelist ip
+	ip_address = request.META.get('HTTP_X_FORWARDED_FOR') or request.META.get('REMOTE_ADDR')
+	#get machine
+	machine = Machine.objects.get(ip = ip_address)
+	if (machine==None):
+		return
+	#counter check
+	if (machine.counter!=request.POST.get('counter')):
+		return
+	response = HttpResponse()
+	machine.counter = machine.counter + 1
+	machine.save()
 	facilityList = request.POST.get('facility')
 	severityList = request.POST.get('severity')
 	versionList = request.POST.get('version')
@@ -31,16 +41,16 @@ def log(request):
 				timestampList[i] = None
 			logs = Log.objects.create(facility=int(facilityList[i]),severity=int(severityList[i]),version=int(versionList[i]),
 			timestamp=timestampList[i],hostname=hostnameList[i],appname=appnameList[i],procid=procidList[i],msgid=msgidList[i],
-			structuredData=structuredDataList[i],msg=msgList[i])
+			structuredData=structuredDataList[i],msg=msgList[i],machine=machine)
 		logs.save()
 		response.status_code = 200
 		return response
 	except:
-		logs = Log.objects.all()
-		context = {'logs': logs}
-		#response.status_code = 400
-		return render(request, 'logService/allLogs.html', context)#response
+		response.status_code = 400
+		return response
 
+@login_required()#Za bolje objasnjenje pogledati https://docs.djangoproject.com/en/dev/topics/auth/default/#the-login-required-decorator
+@permission_required('logService.get_log')#NazivAplikacije.imePermisije; default permisije koje postoje su: add_nazivModela,change_nazivModela,delete_nazivModela 
 def getLogs(request):
 	logs= Log.objects.all()
 	context= {'logs': logs}
