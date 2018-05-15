@@ -16,8 +16,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include,path
 
+from siemServer import startup
+
 urlpatterns = [
     path('admin/', admin.site.urls),
 	path('api/',include('logService.urls')),
 	path('api/',include('alarmService.urls')),
 ]
+
+startup.start()

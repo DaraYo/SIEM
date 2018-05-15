@@ -24,7 +24,7 @@ class Log(models.Model):
 	msgid = models.CharField(max_length=50)
 	structuredData = models.TextField()
 	msg = models.TextField()
-	machine = models.ForeignKey(Machine)
+	machine = models.ForeignKey(Machine, on_delete=models.CASCADE)
 	class Meta:
 		ordering = ["-timestamp","-severity"]
 		get_latest_by = ["-timestamp"]
