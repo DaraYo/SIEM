@@ -14,9 +14,9 @@ class Machine(models.Model):
 	#default permisije: add_machine,change_machine,delete_machine 
 
 class Log(models.Model):
-	facility = models.SmallIntegerField()
-	severity = models.SmallIntegerField()
-	version = models.SmallIntegerField()
+	facility = models.CharField(max_length=2)
+	severity = models.CharField(max_length=1)
+	version = models.CharField(max_length=5)
 	timestamp = models.DateTimeField(null=True)
 	hostname = models.CharField(max_length=50)
 	appname = models.CharField(max_length=50)

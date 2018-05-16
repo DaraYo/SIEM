@@ -1,5 +1,10 @@
 from django.contrib import admin
-from .models import Log
+from .models import Log,Machine
 
 # Register your models here.
-#admin.site.register(Log)
+class LogAdmin(admin.ModelAdmin):
+    pass
+class MachineAdmin(admin.ModelAdmin):
+    pass
+admin.site.register(Log,LogAdmin)
+admin.site.register(Machine,MachineAdmin)
