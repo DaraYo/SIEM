@@ -20,6 +20,7 @@ from siemServer import startup
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+	path('', include('django.contrib.auth.urls')),
 	path('api/',include('logService.urls')),
 	path('api/',include('alarmService.urls')),
 ]
