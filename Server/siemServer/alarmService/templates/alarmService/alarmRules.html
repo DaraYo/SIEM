@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Alarm Logs</title>
+</head>
+<body>
+
+
+	{% if alarmrules %}
+        <table>
+            <tr>
+                <th>Regexp</th>
+                <th>Text</th>
+                <th>Type</th>
+				<th>Repeat</th>
+				<th>System specified</th>
+				<th>Machine specified</th>
+				<th>Timed</th>
+				<th>Hours</th>
+				<th>Active</th>
+            </tr>
+        {% for alarm in alarmrules %}
+            <tr>
+                <td>{{ alarm.regexp }}</td>
+				<td>{{ alarm.text }}</td>
+				<td>{{ alarm.type }}</td>
+				<td>{{ alarm.repeat }}</td>
+				<td>{{ alarm.sysspec }}</td>
+				<td>{{ alarm.machinespec }}</td>
+				<td>{{ alarm.timed }}</td>
+				<td>{{ alarm.hours }}</td>
+				<td>{{ alarm.active }}</td>
+					   
+            </tr>
+        {% endfor %}
+        </table>
+    {% else %}
+        <p>No alarm rules are available.</p>
+    {% endif %}
+</body>
+</html>
