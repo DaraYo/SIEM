@@ -50,26 +50,25 @@ def log(request):
 		response.status_code = 400
 		return response
 
-@login_required()#Za bolje objasnjenje pogledati https://docs.djangoproject.com/en/dev/topics/auth/default/#the-login-required-decorator
-@permission_required('logService.get_log')#NazivAplikacije.imePermisije; default permisije koje postoje su: add_nazivModela,change_nazivModela,delete_nazivModela 
+#@login_required()#Za bolje objasnjenje pogledati https://docs.djangoproject.com/en/dev/topics/auth/default/#the-login-required-decorator
+#@permission_required('logService.get_log')#NazivAplikacije.imePermisije; default permisije koje postoje su: add_nazivModela,change_nazivModela,delete_nazivModela 
 def getLogs(request):
 	try:
 		#pages
-		fromlog = int(request.GET.get('from'))
-		tolog = int(request.GET.get('to'))
+		fromlog = int(request.GET.get('from') or 0)
+		tolog = int(request.GET.get('to') or 50)
 		#regex
-		facility = request.GET.get('facility')
-		severity = request.GET.get('severity')
-		hostname = request.GET.get('hostname')
-		appname = request.GET.get('appname')
-		msgid = request.GET.get('msgid')
+		facility = request.GET.get('facility') or ""
+		severity = request.GET.get('severity') or ""
+		hostname = request.GET.get('hostname') or ""
+		appname = request.GET.get('appname') or ""
+		msgid = request.GET.get('msgid') or ""
 		#time
-		timestampF = request.GET.get('timestampfrom')
-		timestampT = request.GET.get('timestampto')
+		timestampF = request.GET.get('timestampfrom') or "None"
+		timestampT = request.GET.get('timestampto') or "None"
 
 		#filter by caps insensitive regex
 		logs = Log.objects.filter(facility__iregex=facility,severity__iregex=severity,hostname__iregex=hostname, appname__iregex=appname, msgid__iregex=msgid)
-
 		if(timestampF!='None'):
 			timestampF = datetime.strptime(timestampF,'%Y-%m-%dT%H:%M:%S.%f%z')
 		else:

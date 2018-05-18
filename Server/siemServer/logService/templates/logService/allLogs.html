@@ -3,46 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <title>Logs</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" />
 </head>
 <body>
-    {% if logs %}
-        <table>
-            <tr>
-                <th>Facility</th>
-                <th>Severity</th>
-                <th>Version</th>
-				<th>Time stamp</th>
-				<th>Host name</th>
-				<th>App name</th>
-				<th>Proc ID</th>
-				<th>Message ID</th>
-				<th>Structured Data</th>
-				<th>Message</th>
-            </tr>
-        {% for log in logs %}
-            <tr>
-                <td>{{ log.facility }}</td>
-				<td>{{ log.severity }}</td>                
-				<td>{{ log.version }}</td>
-				<td>{{ log.timestamp }}</td>
-				<td>{{ log.hostname }}</td>
-				<td>{{ log.appname }}</td>
-				<td>{{ log.procid }}</td>
-				<td>{{ log.msgid }}</td>
-				<td>{{ log.structuredData }}</td>
-				<td>{{ log.msg }}</td>
+	<h1 class="page-title">Logs</h1>
+	<form action="getLogs" method="get">
+		<input type="text" name="from"/>
+		<input type="text" name="to"/>
+		<input type="text" name="facility"/>
+		<input type="text" name="severity"/>
+		<input type="text" name="hostname"/>
+		<input type="text" name="appname"/>
+		<input type="text" name="msgid"/>
+		<input type="text" name="timestampfrom"/>
+		<input type="text" name="timestampto"/>
+		<input type="submit" class="btn" value="Click" name="search">
+	</form>
+	<table class="table table-striped">
+		<tr class="thead-dark">
+			<th>Facility</th>
+			<th>Severity</th>
+			<th>Version</th>
+			<th>Time stamp</th>
+			<th>Host name</th>
+			<th>App name</th>
+			<th>Proc ID</th>
+			<th>Message ID</th>
+			<th>Structured Data</th>
+			<th>Message</th>
+		</tr>
+	{% for log in logs %}
+		<tr>
+			<td>{{ log.facility }}</td>
+			<td>{{ log.severity }}</td>                
+			<td>{{ log.version }}</td>
+			<td>{{ log.timestamp }}</td>
+			<td>{{ log.hostname }}</td>
+			<td>{{ log.appname }}</td>
+			<td>{{ log.procid }}</td>
+			<td>{{ log.msgid }}</td>
+			<td>{{ log.structuredData }}</td>
+			<td>{{ log.msg }}</td>
 
-            </tr>
-        {% endfor %}
-        </table>
-        <form action="#" method="get">
-            <input type="text" name="version"/>
-            <input type="text" name="msgId"/>
-            <input type="text" name="msg"/>
-            <input type="submit" class="btn" value="Click" name="search">
-        </form>
-    {% else %}
-        <p>No logs are available.</p>
-    {% endif %}
+		</tr>
+	{% endfor %}
+	</table>
 </body>
 </html>
