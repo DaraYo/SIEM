@@ -3,28 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <title>Alarm Logs</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" />
 </head>
 <body>
-    {% if alarms %}
-        <table>
-            <tr>
-                <th>Alarm</th>
-                <th>Time</th>
-                <th>Machine</th>
-				<th>Seen</th>
-            </tr>
-        {% for alarm in alarms %}
-            <tr>
-                <td>{{ alarm.alarm }}</td>
-				<td>{{ alarm.time }}</td>
-				<td>{{ alarm.machine }}</td>
-				<td>{{ alarm.seen }}</td>
-
-            </tr>
-        {% endfor %}
-        </table>
-    {% else %}
-        <p>No alarms are available.</p>
-    {% endif %}
+	<div>
+		<h1 style="display: inline"> <a href="getLogs">Logs</a></h1>
+		<h1 style="display: inline">Alarms</h1>
+	</div>
+	<br>
+	<div class="row">
+		<div class="col">
+			<form action="getLogs" method="get">
+				<input type="text" value="" name="from"/>
+				<input type="text" value="" name="to"/>
+				<br>
+				Alarm:
+				<br>
+				<input type="text" name="alarm" style="width:100%;"/>
+				<br>
+				Machine:
+				<br>
+				<input type="text" name="machine" style="width:100%;"/>
+				<br>
+				Date from:
+				<br>
+				<input type="text" name="timestampfrom" style="width:100%;"/>
+				<br>
+				Date to:
+				<br>
+				<input type="text" name="timestampto" style="width:100%;"/>
+				<br>
+				<input type="submit" class="btn" value="Search" name="search" style="width:100%;">
+			</form>
+		</div>
+		<div class="col-10">
+			<table class="table table-striped">
+				<tr class="thead-dark">
+					<th>Alarm</th>
+					<th>Time</th>
+					<th>Machine</th>
+					<th>Seen</th>
+				</tr>
+				{% for alarm in alarms %}
+				<tr>
+					<td>{{ alarm.alarm }}</td>
+					<td>{{ alarm.time }}</td>
+					<td>{{ alarm.machine }}</td>
+					<td>{{ alarm.seen }}</td>
+				</tr>
+				{% endfor %}
+			</table>
+		</div>
+	</div>
 </body>
 </html>

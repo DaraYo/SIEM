@@ -6,47 +6,78 @@
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" />
 </head>
 <body>
-	<h1 class="page-title">Logs</h1>
-	<form action="getLogs" method="get">
-		<input type="text" name="from"/>
-		<input type="text" name="to"/>
-		<input type="text" name="facility"/>
-		<input type="text" name="severity"/>
-		<input type="text" name="hostname"/>
-		<input type="text" name="appname"/>
-		<input type="text" name="msgid"/>
-		<input type="text" name="timestampfrom"/>
-		<input type="text" name="timestampto"/>
-		<input type="submit" class="btn" value="Click" name="search">
-	</form>
-	<table class="table table-striped">
-		<tr class="thead-dark">
-			<th>Facility</th>
-			<th>Severity</th>
-			<th>Version</th>
-			<th>Time stamp</th>
-			<th>Host name</th>
-			<th>App name</th>
-			<th>Proc ID</th>
-			<th>Message ID</th>
-			<th>Structured Data</th>
-			<th>Message</th>
-		</tr>
-	{% for log in logs %}
-		<tr>
-			<td>{{ log.facility }}</td>
-			<td>{{ log.severity }}</td>                
-			<td>{{ log.version }}</td>
-			<td>{{ log.timestamp }}</td>
-			<td>{{ log.hostname }}</td>
-			<td>{{ log.appname }}</td>
-			<td>{{ log.procid }}</td>
-			<td>{{ log.msgid }}</td>
-			<td>{{ log.structuredData }}</td>
-			<td>{{ log.msg }}</td>
-
-		</tr>
-	{% endfor %}
-	</table>
+	<div>
+		<h1 style="display: inline">Logs</h1>
+		<h1 style="display: inline"> <a href="allAlarms">Alarms</a></h1>
+	</div>
+	<br>
+	<div class="row">
+		<div class="col">
+			<form action="getLogs" method="get">
+				<input type="text" value="" name="from"/>
+				<input type="text" value="" name="to"/>
+				<br>
+				Facility:
+				<br>
+				<input type="text" name="facility" style="width:100%;"/>
+				<br>
+				Severity:
+				<br>
+				<input type="text" name="severity" style="width:100%;"/>
+				<br>
+				Host name:
+				<br>
+				<input type="text" name="hostname" style="width:100%;"/>
+				<br>
+				Application name:
+				<br>
+				<input type="text" name="appname" style="width:100%;"/>
+				<br>
+				Message ID:
+				<br>
+				<input type="text" name="msgid" style="width:100%;"/>
+				<br>
+				Date from:
+				<br>
+				<input type="text" name="timestampfrom" style="width:100%;"/>
+				<br>
+				Date to:
+				<br>
+				<input type="text" name="timestampto" style="width:100%;"/>
+				<br>
+				<input type="submit" class="btn" value="Search" name="search" style="width:100%;">
+			</form>
+		</div>
+		<div class="col-10">
+			<table class="table table-striped">
+				<tr class="thead-dark">
+					<th>Facility</th>
+					<th>Severity</th>
+					<th>Version</th>
+					<th>Time stamp</th>
+					<th>Host name</th>
+					<th>Application name</th>
+					<th>Proc ID</th>
+					<th>Message ID</th>
+					<th>Structured Data</th>
+					<th>Message</th>
+				</tr>
+				{% for log in logs %}
+				<tr>
+					<td>{{ log.facility }}</td>
+					<td>{{ log.severity }}</td>                
+					<td>{{ log.version }}</td>
+					<td>{{ log.timestamp }}</td>
+					<td>{{ log.hostname }}</td>
+					<td>{{ log.appname }}</td>
+					<td>{{ log.procid }}</td>
+					<td>{{ log.msgid }}</td>
+					<td>{{ log.structuredData }}</td>
+					<td>{{ log.msg }}</td>
+				</tr>
+				{% endfor %}
+			</table>
+		</div>
+	</div>
 </body>
 </html>
