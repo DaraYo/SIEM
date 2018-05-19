@@ -44,3 +44,5 @@ def getAlarmRules(request):
 
 def createRule(request):
 	return render(request,'alarmService/createRule.html')
+
+	
