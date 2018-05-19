@@ -8,19 +8,27 @@ def main():
 	f=open("config.config","r")
 	config = f.readlines()
 	f.close()
-
+	
 	centralAgent=config[0]
 	timer=config[1]
 	filter=config[2]
+	
+	
+	counter= config[3]
 	log_list=[]
 	#Izbacivanje osnovnih configa iz liste da bi ostale samo liste direktorijuma
+	config.remove(counter)
 	config.remove(centralAgent)
 	config.remove(timer)
 	config.remove(filter)
-	
+	counter=eval(counter)
+	if(filter=="\n"):
+		filter=""
 	#Dict koji ce imati podatke o tome od koje linije da cita logove
 	messages_dict={}
-	
+	#Regex filter
+	r = re.compile(filter)
+
 	#Formiranje dicta
 	for ldl in config:
 		log_list=glob.glob(ldl+"/*.log")
@@ -31,7 +39,7 @@ def main():
 			#fname=log.split('\\')
 			#messages_dict[fname[len(fname)-1]]=len(log_messages)
 			messages_dict[log]=len(log_messages)
-	
+	print(len(messages_dict))
 	while True:
 		facility_l=[]
 		severity_l=[]
@@ -55,7 +63,11 @@ def main():
 				if messages_dict[log]<len(log_messages):
 					for i in range(messages_dict[log],len(log_messages)):
 						#Ovo treba prepraviti da radi sa regex
-						if True:	
+						print("OVDE2")
+						print(log_messages[i])
+						
+						if r.match(log_messages[i]):	
+							print("OVDE")
 							parts = log_messages[i].split(" ")
 							PRIVERS = parts[0].split(">")
 							PRI = PRIVERS[0].split("<")[1]
@@ -100,8 +112,10 @@ def main():
 		#Slanje listi na server
 		if len(msg_l)!=0:
 			print("Sent "+str(len(msg_l))+" messages to server")
-			payload={'facility':facility_l,'severity':severity_l,'version':version_l,'timestamp':timestamp_l,'hostname':hostname_l,'appname':appname_l,'procid':procid_l,'msgid':msgid_l,'structuredData':sdata_l,'msg':msg_l}
+			payload={'counter':counter,'facility':facility_l,'severity':severity_l,'version':version_l,'timestamp':timestamp_l,'hostname':hostname_l,'appname':appname_l,'procid':procid_l,'msgid':msgid_l,'structuredData':sdata_l,'msg':msg_l}
 			requests.post(centralAgent,data=payload)
+			counter+=1
+			
 
 		
 if __name__=="__main__":
