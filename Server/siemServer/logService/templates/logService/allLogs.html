@@ -9,7 +9,10 @@
 	<div>
 		<h1 style="display: inline">Logs</h1>
 		<h2 style="display: inline"> <a href="allAlarms">Alarms</a></h2>
+		{% if perms.alarmService.get_alarm_rules %}
 		<h2 style="display: inline"><a href="alarmRules">Alarm Rules</a></h2>
+		{% endif %}
+        <a href="/accounts/logout" class="btn btn-primary" role="button" style="float: right;">Logout</a>
 	</div>
 	<br>
 	<div class="row">

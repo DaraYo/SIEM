@@ -2,14 +2,16 @@ from django.shortcuts import render
 from .models import AlarmLog,Alarm
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import redirect
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 # Create your views here.
 
-@login_required(login_url="/login")
+@login_required(login_url="/accounts/login")
+@permission_required('alarmService.get_alarms')
 def getAlarmLogs(request):
 	alarms= AlarmLog.objects.all()
 	context= {'alarms': alarms}
 	return render(request, 'alarmService/allAlarms.html', context)
+
 @csrf_exempt
 def generateAlarm(request):
 	a = Alarm()
@@ -37,11 +39,15 @@ def generateAlarm(request):
 	#response.status_code = 200
 	return redirect('alarmRules')
 
+@login_required(login_url="/accounts/login")
+@permission_required('alarmService.get_alarm_rules')
 def getAlarmRules(request):
 	alarmRules = Alarm.objects.all()
 	context = {'alarmrules':alarmRules}
 	return render(request, 'alarmService/alarmRules.html',context)
 
+@login_required(login_url="/accounts/login")
+@permission_required('alarmService.add_alarm')
 def createRule(request):
 	return render(request,'alarmService/createRule.html')
 
