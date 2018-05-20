@@ -11,15 +11,15 @@ from .models import Log,Machine
 
 # Create your views here.
 def log(request):
-	#add protection
 	#whitelist ip
 	ip_address = request.META.get('HTTP_X_FORWARDED_FOR') or request.META.get('REMOTE_ADDR')
 	#get machine
 	machine = Machine.objects.get(ip = ip_address)
+	counter = int(request.POST.get('counter'))
 	if (machine==None):
 		return
 	#counter check
-	if (machine.counter!=request.POST.get('counter')):
+	if (machine.counter!=counter):
 		return
 	response = HttpResponse()
 	machine.counter = machine.counter + 1
@@ -55,17 +55,17 @@ def log(request):
 def getLogs(request):
 	try:
 		#pages
-		fromlog = int(request.GET.get('from') or 0)
-		tolog = int(request.GET.get('to') or 50)
+		fromlog = int(request.GET.get('from',"0"))
+		tolog = int(request.GET.get('to',"50"))
 		#regex
-		facility = request.GET.get('facility') or ""
-		severity = request.GET.get('severity') or ""
-		hostname = request.GET.get('hostname') or ""
-		appname = request.GET.get('appname') or ""
-		msgid = request.GET.get('msgid') or ""
+		facility = request.GET.get('facility',"")
+		severity = request.GET.get('severity',"")
+		hostname = request.GET.get('hostname',"")
+		appname = request.GET.get('appname',"")
+		msgid = request.GET.get('msgid',"")
 		#time
-		timestampF = request.GET.get('timestampfrom') or "None"
-		timestampT = request.GET.get('timestampto') or "None"
+		timestampF = request.GET.get('timestampfrom',"None")
+		timestampT = request.GET.get('timestampto',"None")
 
 		#filter by caps insensitive regex
 		logs = Log.objects.filter(facility__iregex=facility,severity__iregex=severity,hostname__iregex=hostname, appname__iregex=appname, msgid__iregex=msgid)
