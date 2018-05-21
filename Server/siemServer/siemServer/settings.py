@@ -124,6 +124,7 @@ LOGOUT_REDIRECT_URL = '/accounts/login'
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 #SECURE_PROXY_SSL_HEADER= ('HTTP_X_FORWARDED_PROTO', 'https')
 #SECURE_SSL_REDIRECT= True
