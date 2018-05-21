@@ -40,10 +40,10 @@
          color: white;
          padding: 15px;">
          <h2 style="display: inline">
-         <a href="getLogs">Logs</a></h2>
-         <h1 style="display: inline">Alarms</h1>
+         <a href="getLogs" style="text-decoration: none">   Logs   </a></h2>
+         <h1 style="display: inline">   Alarms   </h1>
          {% if perms.alarmService.get_alarm_rules %}
-         <h2 style="display: inline"><a href="alarmRules">Alarm Rules</a></h2>
+         <h2 style="display: inline"><a style="text-decoration: none" href="alarmRules">   Alarm Rules   </a></h2>
          {% endif %}
          <a href="/accounts/logout" class="btn btn-primary" role="button" style="float: right;">Logout</a>
       </div>
