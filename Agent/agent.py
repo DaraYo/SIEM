@@ -3,27 +3,17 @@ import requests
 import re
 import time
 import sys
+from ruamel import yaml
+from settings import centralAgent,timer,filter,directoriums
 def main():
-	#Citanje konfig fajla
+
+	
 	f=open("config.config","r")
 	config = f.readlines()
 	f.close()
+	counter= eval(config[0])
 	
-	centralAgent=config[0]
-	timer=config[1]
-	filter=config[2]
-	
-	
-	counter= config[3]
-	log_list=[]
-	#Izbacivanje osnovnih configa iz liste da bi ostale samo liste direktorijuma
-	config.remove(counter)
-	config.remove(centralAgent)
-	config.remove(timer)
-	config.remove(filter)
-	counter=eval(counter)
-	if(filter=="\n"):
-		filter=""
+	config=directoriums
 	#Dict koji ce imati podatke o tome od koje linije da cita logove
 	messages_dict={}
 	#Regex filter
@@ -113,8 +103,11 @@ def main():
 		if len(msg_l)!=0:
 			print("Sent "+str(len(msg_l))+" messages to server")
 			payload={'counter':counter,'facility':facility_l,'severity':severity_l,'version':version_l,'timestamp':timestamp_l,'hostname':hostname_l,'appname':appname_l,'procid':procid_l,'msgid':msgid_l,'structuredData':sdata_l,'msg':msg_l}
-			requests.post(centralAgent,data=payload)
+			#requests.post(centralAgent,data=payload)
 			counter+=1
+			f = open("config.config","w")
+			print(counter,file=f)
+			f.close()
 			
 
 		
