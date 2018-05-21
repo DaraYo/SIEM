@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <title>Logs</title>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" />
+	<script>
+		function fromTo(i) {
+			document.getElementById("from").value = (i-1)*50;
+			document.getElementById("to").value=i*50;
+			document.getElementById("submit").click();
+		}
+	</script>
 </head>
 <body>
 	<div>
@@ -19,8 +26,8 @@
 		<div class="col">
 			<h4>Search Logs</h4>
 			<form action="getLogs" method="get">
-				<input type="hidden"  name="from"/>
-				<input type="hidden" value="{{tolog}}" name="to"/>
+				<input id="from" type="hidden" value="{{ fromlog }}" name="from"/>
+				<input id="to" type="hidden" value="{{tolog}}" name="to"/>
 				<br>
 				Facility:
 				<br>
@@ -50,13 +57,11 @@
 				<br>
 				<input type="text" name="timestampto" style="width:100%;"/>
 				<br>
-				<input type="submit" class="btn" value="Search" name="search" style="width:100%;">
+				<input id="submit" type="submit" class="btn" value="Search" name="submit" style="width:100%;">
 			</form>
-			<form action="getLogs" method="get">
-				{% for i in total_pages %}
-					<input type="submit" class="btn" value="{{ i }}">
-				{% endfor %}
-			</form>
+			{% for i in total_pages %}
+				<input type="button" value="{{ i }}" onclick="fromTo('{{ i }}');">
+			{% endfor %}
 		</div>
 		<div class="col-10">
 			<table class="table table-striped">
