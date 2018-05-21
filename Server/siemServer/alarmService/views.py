@@ -2,6 +2,7 @@ from django.shortcuts import render
 from .models import AlarmLog,Alarm
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import redirect
+from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required, permission_required
 # Create your views here.
 
@@ -15,29 +16,34 @@ def getAlarmLogs(request):
 @csrf_exempt
 def generateAlarm(request):
 	a = Alarm()
-	a.regexp = request.POST.get('regexp')
-	a.text = request.POST.get('text')
-	a.type = request.POST.get('type')
-	a.repeat = request.POST.get('repeat')
-	if(request.POST.get('sysspec')=='on'):
-		a.sysspec = True
-	else:
-		a.sysspec = False
-	if request.POST.get('macspec')=='on':
-		a.machinespec = True
-	else:
-		a.machinespec = False
-	if request.POST.get('timed')=='on':
-		a.timed = True
-		a.hours = request.POST.get('hours')
-	else:
-		a.timed = False
-		a.hours = 0
-	a.active = True
-	
-	a.save()
-	#response.status_code = 200
-	return redirect('alarmRules')
+	response = HttpResponse()
+	try:
+		a.regexp = request.POST.get('regexp')
+		a.text = request.POST.get('text')
+		a.type = request.POST.get('type')
+		a.repeat = request.POST.get('repeat')
+		if(request.POST.get('sysspec')=='on'):
+			a.sysspec = True
+		else:
+			a.sysspec = False
+		if request.POST.get('macspec')=='on':
+			a.machinespec = True
+		else:
+			a.machinespec = False
+		if request.POST.get('hours')=='':
+			a.timed = False
+			a.hours = 0
+		else:
+			a.timed = True
+			a.hours = eval(request.POST.get('hours'))
+		a.active = True
+		
+		a.save()
+		#response.status_code = 200
+		return redirect('alarmRules')
+	except:
+		response.status_code = 406
+		return response
 
 @login_required(login_url="/accounts/login")
 @permission_required('alarmService.get_alarm_rules')

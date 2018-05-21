@@ -17,30 +17,30 @@
 	<br>
 	<div class="row">
 		<div class="col">
-			Search Logs
+			<h4>Search Logs</h4>
 			<form action="getLogs" method="get">
-				<input type="text" value="" name="from"/>
-				<input type="text" value="" name="to"/>
+				<input type="hidden"  name="from"/>
+				<input type="hidden" value="{{tolog}}" name="to"/>
 				<br>
 				Facility:
 				<br>
-				<input type="text" name="facility" style="width:100%;"/>
+				<input type="text" name="facility" value="{{ facility }}" style="width:100%;"/>
 				<br>
 				Severity:
 				<br>
-				<input type="text" name="severity" style="width:100%;"/>
+				<input type="text" name="severity" value="{{severity}}" style="width:100%;"/>
 				<br>
 				Host name:
 				<br>
-				<input type="text" name="hostname" style="width:100%;"/>
+				<input type="text" name="hostname" value="{{hostname}}" style="width:100%;"/>
 				<br>
 				Application name:
 				<br>
-				<input type="text" name="appname" style="width:100%;"/>
+				<input type="text" name="appname" value="{{appname}}" style="width:100%;"/>
 				<br>
 				Message ID:
 				<br>
-				<input type="text" name="msgid" style="width:100%;"/>
+				<input type="text" name="msgid" value="{{msgid}}" style="width:100%;"/>
 				<br>
 				Date from:
 				<br>
@@ -51,6 +51,11 @@
 				<input type="text" name="timestampto" style="width:100%;"/>
 				<br>
 				<input type="submit" class="btn" value="Search" name="search" style="width:100%;">
+			</form>
+			<form action="getLogs" method="get">
+				{% for i in total_pages %}
+					<input type="submit" class="btn" value="{{ i }}">
+				{% endfor %}
 			</form>
 		</div>
 		<div class="col-10">
@@ -83,6 +88,7 @@
 				{% endfor %}
 			</table>
 		</div>
+
 	</div>
 </body>
 </html>

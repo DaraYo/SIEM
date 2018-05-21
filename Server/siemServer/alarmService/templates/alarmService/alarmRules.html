@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <title>Alarm Logs</title>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" />
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js">
+	
+	</script>
 </head>
 <body>
 	<div>
@@ -17,7 +20,7 @@
 	<br>
 	<div class="row">
 		<div class="col">
-			Create alarm rule
+			<h4>Create alarm rule</h4>
 			<form method = post action = "./generateAlarm">
 			
 				Regexp
@@ -30,11 +33,18 @@
 				<br>
 				Type
 				<br>
-				<input name='type' style="width:100%;"/>
+				<select name="type" style="width:100%;">
+				  <option value="Emergency">Emergency</option>
+				  <option value="Alert">Alert</option>
+				  <option value="Critical">Critical</option>
+				  <option value="Error">Error</option>
+				  <option value="Warning">Warning</option>
+				  <option value="Notice">Notice</option>
+				</select>
 				<br>
 				Repeat
 				<br>
-				<input name='repeat' style="width:100%;"/>
+				<input name='repeat' pattern="[0-9.]+" style="width:100%;"/>
 				<br>
 				System specified
 				<input type="checkbox" name="sysspec"/>
@@ -42,12 +52,9 @@
 				Machine specified
 				<input type="checkbox" name="macspec"/>
 				<br>
-				Timed
-				<input type="checkbox" name="timed"/>
-				<br>
 				Hours
 				<br>
-				<input name='hours' style="width:100%;"/>
+				<input name='hours' id='hours' pattern="[0-9.]+" style="width:100%;"/>
 				<br>
 				<input type="submit" value="Generate" style="width:100%;"/>
 

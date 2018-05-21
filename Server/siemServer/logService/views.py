@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import permission_required,login_required
 
 from datetime import datetime, timedelta
 import re
-
+import math
 from .models import Log,Machine
 #from alarmService.models import AlarmLog
 
@@ -55,17 +55,17 @@ def log(request):
 def getLogs(request):
 	try:
 		#pages
-		fromlog = int(request.GET.get('from',"0"))
-		tolog = int(request.GET.get('to',"50"))
+		fromlog = int(request.GET.get('from') or "0")
+		tolog = int(request.GET.get('to') or "50")
 		#regex
-		facility = request.GET.get('facility',"")
-		severity = request.GET.get('severity',"")
-		hostname = request.GET.get('hostname',"")
-		appname = request.GET.get('appname',"")
-		msgid = request.GET.get('msgid',"")
+		facility = request.GET.get('facility') or ""
+		severity = request.GET.get('severity') or ""
+		hostname = request.GET.get('hostname') or ""
+		appname = request.GET.get('appname') or ""
+		msgid = request.GET.get('msgid') or ""
 		#time
-		timestampF = request.GET.get('timestampfrom',"None")
-		timestampT = request.GET.get('timestampto',"None")
+		timestampF = request.GET.get('timestampfrom') or "None"
+		timestampT = request.GET.get('timestampto') or "None"
 
 		#filter by caps insensitive regex
 		logs = Log.objects.filter(facility__iregex=facility,severity__iregex=severity,hostname__iregex=hostname, appname__iregex=appname, msgid__iregex=msgid)
@@ -79,9 +79,17 @@ def getLogs(request):
 			timestampT = datetime.now()
 
 		logs = logs.filter(timestamp__range=(timestampF,timestampT))
+		#Nesto za paginaciju
+		logs_len=math.ceil(len(logs)/50)
+		total_pages=[]
+		for i in range(0,logs_len):
+			total_pages.append(i+1)
+		print(total_pages)
+		#
 		logs = logs[fromlog:tolog]
 
-		return render(request, 'logService/allLogs.html', {'logs':logs})
+		return render(request, 'logService/allLogs.html', {'logs':logs,'total_pages':total_pages,'fromlog':fromlog,'tolog':tolog,'facility':facility,'severity':severity,'hostname':hostname,'appname':appname,'msgid':msgid})
 	except ValueError:
+		print("ERROR")
 		#Timestamp format was bad
 		return render(request, 'logService/allLogs.html', {'logs':[]})

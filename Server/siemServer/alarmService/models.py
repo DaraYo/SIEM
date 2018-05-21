@@ -4,22 +4,36 @@ from logService.models import Machine
 
 # Create your models here.
 class Alarm(models.Model):
-    regexp = models.CharField(max_length=100)
-    text= models.CharField(max_length=1000)
-    type= models.CharField(max_length=20)
-    repeat = models.SmallIntegerField()
-    sysspec = models.BooleanField()
-    machinespec = models.BooleanField()
-    timed = models.BooleanField()
-    hours = models.SmallIntegerField(null=True)
-    active = models.BooleanField()
+	regexp = models.CharField(max_length=100)
+	text= models.CharField(max_length=1000)
+	Emergency=0
+	Alert=1
+	Critical=2
+	Error=3
+	Warning=4
+	Notice=5
+	Type_CHOICES = (
+		(Emergency, 'Emergency'),
+		(Alert, 'Alert'),
+		(Critical, 'Critical'),
+		(Error, 'Error'),
+		(Warning, 'Warning'),
+		(Notice, 'Notice')
+		)
+	repeat = models.SmallIntegerField()
+	type= models.CharField(max_length=1,choices = Type_CHOICES)
+	sysspec = models.BooleanField()
+	machinespec = models.BooleanField()
+	timed = models.BooleanField()
+	hours = models.SmallIntegerField(null=True)
+	active = models.BooleanField()
 
-    def __str__(self):
-        return self.text
+	def __str__(self):
+		return self.text
 
-    class Meta:
-        permissions = (("get_alarm_rules","Can see rules of active alarms"),)
-        #default permisije: add_alarm,change_alarm,delete_alarm 
+	class Meta:
+		permissions = (("get_alarm_rules","Can see rules of active alarms"),)
+	#default permisije: add_alarm,change_alarm,delete_alarm 
 
 class AlarmLog(models.Model):
     alarm = models.ForeignKey(Alarm,on_delete=models.CASCADE)
