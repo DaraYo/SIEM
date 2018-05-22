@@ -1,9 +1,15 @@
+import time
+import threading
+
 from django.shortcuts import render
 from .models import AlarmLog,Alarm
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import redirect
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required, permission_required
+
+from siemServer.settings import CHECK_EVERY_X_SECONDS
+
 # Create your views here.
 
 @login_required(login_url="/accounts/login")
@@ -57,4 +63,17 @@ def getAlarmRules(request):
 def createRule(request):
 	return render(request,'alarmService/createRule.html')
 
-	
+def alarmCheck():
+	print('A')
+	pass
+
+def alarmCheckRunner():
+	t1 = threading.Thread(target=alarmCheckBeat)
+	t1.start()
+
+def alarmCheckBeat():
+	while(alarmBeatRunning):
+		time.sleep(CHECK_EVERY_X_SECONDS)
+		alarmCheck()
+
+alarmBeatRunning = True

@@ -2,6 +2,8 @@ from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.db import IntegrityError
 
+from alarmService.views import alarmCheckRunner
+
 def start():
     groupO, created = Group.objects.get_or_create(name='operator')
     if (created):
@@ -40,3 +42,4 @@ def start():
         user.save()
     except IntegrityError:
         pass
+    alarmCheckRunner()
