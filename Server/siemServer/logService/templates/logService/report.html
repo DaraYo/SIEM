@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Report</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" />
+</head>
+<body>
+    <div>
+		<h2 style="display: inline">Logs</h2>
+		<h2 style="display: inline"> <a href="allAlarms">Alarms</a></h2>
+		{% if perms.alarmService.get_alarm_rules %}
+		<h2 style="display: inline"><a href="alarmRules">Alarm Rules</a></h2>
+		{% endif %}
+		<h1 style="display: inline"><a href="report">Report</a></h1>
+        <a href="/accounts/logout" class="btn btn-primary" role="button" style="float: right;">Logout</a>
+	</div>
+	<br>
+    <table class="table table-striped">
+				<tr class="thead-dark">
+					<th>Facility</th>
+					<th>Severity</th>
+					<th>Version</th>
+					<th>Time stamp</th>
+					<th>Host name</th>
+					<th>Application name</th>
+					<th>Proc ID</th>
+					<th>Message ID</th>
+					<th>Structured Data</th>
+					<th>Message</th>
+				</tr>
+				{% for report in reports %}
+				<tr>
+					<td>a</td>
+					<td>a</td>
+					<td>a</td>
+					<td>a</td>
+					<td>a</td>
+					<td>a</td>
+					<td>a</td>
+					<td>a</td>
+					<td>a</td>
+					<td>a</td>
+				</tr>
+				{% endfor %}
+			</table>
+</body>

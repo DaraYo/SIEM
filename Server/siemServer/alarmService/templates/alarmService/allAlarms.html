@@ -1,64 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Alarm Logs</title>
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" />
-</head>
-<body>
-	<div>
-		<h2 style="display: inline"><a href="getLogs">Logs</a></h2>
-		<h1 style="display: inline">Alarms</h1>
-        {% if perms.alarmService.get_alarm_rules %}
-		<h2 style="display: inline"><a href="alarmRules">Alarm Rules</a></h2>
-        {% endif %}
-        <a href="/accounts/logout" class="btn btn-primary" role="button" style="float: right;">Logout</a>
-	</div>
-	<br>
-	<div class="row">
-		<div class="col">
-			<!--Search Alarms
-			<form action="getLogs" method="get">
-				<input type="text" value="" name="from"/>
-				<input type="text" value="" name="to"/>
-				<br>
-				Alarm:
-				<br>
-				<input type="text" name="alarm" style="width:100%;"/>
-				<br>
-				Machine:
-				<br>
-				<input type="text" name="machine" style="width:100%;"/>
-				<br>
-				Date from:
-				<br>
-				<input type="text" name="timestampfrom" style="width:100%;"/>
-				<br>
-				Date to:
-				<br>
-				<input type="text" name="timestampto" style="width:100%;"/>
-				<br>
-				<input type="submit" class="btn" value="Search" name="search" style="width:100%;">
-			</form>-->
-		</div>
-		<div class="col-10">
-			<table class="table table-striped">
-				<tr class="thead-dark">
-					<th>Alarm</th>
-					<th>Time</th>
-					<th>Machine</th>
-					<th>Seen</th>
-				</tr>
-				{% for alarm in alarms %}
-				<tr>
-					<td>{{ alarm.alarm }}</td>
-					<td>{{ alarm.time }}</td>
-					<td>{{ alarm.machine }}</td>
-					<td>{{ alarm.seen }}</td>
-				</tr>
-				{% endfor %}
-			</table>
-		</div>
-	</div>
-</body>
+   <head>
+      <meta charset="UTF-8">
+      <title>Logs</title>
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" />
+      <script>
+         function fromTo(i) {
+         	document.getElementById("from").value = (i-1)*50;
+         	document.getElementById("to").value=i*50;
+         	document.getElementById("submit").click();
+         }
+      </script>
+      <style>
+         /* Set height of the grid so .sidenav can be 100% (adjust if needed) */
+         .row.content {height: 1500px}
+         /* Set gray background color and 100% height */
+         .sidenav {
+         background-color: #f1f1f1;
+         height: 100%;
+         }
+         /* Set black background color, white text and some padding */
+         footer {
+         background-color: #555;
+         color: white;
+         padding: 15px;
+         }
+         /* On small screens, set height to 'auto' for sidenav and grid */
+         @media screen and (max-width: 767px) {
+         .sidenav {
+         height: auto;
+         padding: 15px;
+         }
+         .row.content {height: auto;} 
+         }
+      </style>
+   </head>
+   <body>
+		<div style="background-color: #555;
+         color: white;
+         padding: 15px;">
+         <h2 style="display: inline">
+         <a href="getLogs" style="text-decoration: none">   Logs   </a></h2>
+         <h1 style="display: inline">   Alarms   </h1>
+         {% if perms.alarmService.get_alarm_rules %}
+         <h2 style="display: inline"><a style="text-decoration: none" href="alarmRules">   Alarm Rules   </a></h2>
+         {% endif %}
+         <a href="/accounts/logout" class="btn btn-primary" role="button" style="float: right;">Logout</a>
+      </div>
+      <div class="container-fluid">
+         <div class="row content">
+            <div class="col-sm-3 sidenav">
+               <!--Search Alarms
+                  <form action="getLogs" method="get">
+                  	<input type="text" value="" name="from"/>
+                  	<input type="text" value="" name="to"/>
+                  	<br>
+                  	Alarm:
+                  	<br>
+                  	<input type="text" name="alarm" style="width:100%;"/>
+                  	<br>
+                  	Machine:
+                  	<br>
+                  	<input type="text" name="machine" style="width:100%;"/>
+                  	<br>
+                  	Date from:
+                  	<br>
+                  	<input type="text" name="timestampfrom" style="width:100%;"/>
+                  	<br>
+                  	Date to:
+                  	<br>
+                  	<input type="text" name="timestampto" style="width:100%;"/>
+                  	<br>
+                  	<input type="submit" class="btn" value="Search" name="search" style="width:100%;">
+                  </form>-->
+            </div>
+            <div class="col-sm-9">
+               <table class="table table-striped">
+                  <tr class="thead-dark">
+                     <th>Alarm</th>
+                     <th>Time</th>
+                     <th>Machine</th>
+                     <th>Seen</th>
+                  </tr>
+                  {% for alarm in alarms %}
+                  <tr>
+                     <td>{{ alarm.alarm }}</td>
+                     <td>{{ alarm.time }}</td>
+                     <td>{{ alarm.machine }}</td>
+                     <td>{{ alarm.seen }}</td>
+                  </tr>
+                  {% endfor %}
+               </table>
+            </div>
+         </div>
+      </div>
+   </body>
 </html>

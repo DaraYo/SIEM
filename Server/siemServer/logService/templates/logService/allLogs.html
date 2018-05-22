@@ -1,99 +1,117 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Logs</title>
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" />
-	<script>
-		function fromTo(i) {
-			document.getElementById("from").value = (i-1)*50;
-			document.getElementById("to").value=i*50;
-			document.getElementById("submit").click();
-		}
-	</script>
-</head>
-<body>
-	<div>
-		<h1 style="display: inline">Logs</h1>
-		<h2 style="display: inline"> <a href="allAlarms">Alarms</a></h2>
-		{% if perms.alarmService.get_alarm_rules %}
-		<h2 style="display: inline"><a href="alarmRules">Alarm Rules</a></h2>
-		{% endif %}
-        <a href="/accounts/logout" class="btn btn-primary" role="button" style="float: right;">Logout</a>
-	</div>
-	<br>
-	<div class="row">
-		<div class="col">
-			<h4>Search Logs</h4>
-			<form action="getLogs" method="get">
-				<input id="from" type="hidden" value="{{ fromlog }}" name="from"/>
-				<input id="to" type="hidden" value="{{tolog}}" name="to"/>
-				<br>
-				Facility:
-				<br>
-				<input type="text" name="facility" value="{{ facility }}" style="width:100%;"/>
-				<br>
-				Severity:
-				<br>
-				<input type="text" name="severity" value="{{severity}}" style="width:100%;"/>
-				<br>
-				Host name:
-				<br>
-				<input type="text" name="hostname" value="{{hostname}}" style="width:100%;"/>
-				<br>
-				Application name:
-				<br>
-				<input type="text" name="appname" value="{{appname}}" style="width:100%;"/>
-				<br>
-				Message ID:
-				<br>
-				<input type="text" name="msgid" value="{{msgid}}" style="width:100%;"/>
-				<br>
-				Date from:
-				<br>
-				<input type="text" name="timestampfrom" style="width:100%;"/>
-				<br>
-				Date to:
-				<br>
-				<input type="text" name="timestampto" style="width:100%;"/>
-				<br>
-				<input id="submit" type="submit" class="btn" value="Search" name="submit" style="width:100%;">
-			</form>
-			{% for i in total_pages %}
-				<input type="button" value="{{ i }}" onclick="fromTo('{{ i }}');">
-			{% endfor %}
-		</div>
-		<div class="col-10">
-			<table class="table table-striped">
-				<tr class="thead-dark">
-					<th>Facility</th>
-					<th>Severity</th>
-					<th>Version</th>
-					<th>Time stamp</th>
-					<th>Host name</th>
-					<th>Application name</th>
-					<th>Proc ID</th>
-					<th>Message ID</th>
-					<th>Structured Data</th>
-					<th>Message</th>
-				</tr>
-				{% for log in logs %}
-				<tr>
-					<td>{{ log.facility }}</td>
-					<td>{{ log.severity }}</td>                
-					<td>{{ log.version }}</td>
-					<td>{{ log.timestamp }}</td>
-					<td>{{ log.hostname }}</td>
-					<td>{{ log.appname }}</td>
-					<td>{{ log.procid }}</td>
-					<td>{{ log.msgid }}</td>
-					<td>{{ log.structuredData }}</td>
-					<td>{{ log.msg }}</td>
-				</tr>
-				{% endfor %}
-			</table>
-		</div>
+   <head>
+      <meta charset="UTF-8">
+      <title>Logs</title>
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" />
+      <script>
+         function fromTo(i) {
+         	document.getElementById("from").value = (i-1)*50;
+         	document.getElementById("to").value=i*50;
+         	document.getElementById("submit").click();
+         }
+      </script>
+	  <style>
+         /* Set height of the grid so .sidenav can be 100% (adjust if needed) */
+         .row.content {height: 1500px}
+         /* Set gray background color and 100% height */
+         .sidenav {
+         background-color: #f1f1f1;
+         height: 100%;
+         }
+         /* Set black background color, white text and some padding */
+         footer {
+         background-color: #555;
+         color: white;
+         padding: 15px;
+         }
+         /* On small screens, set height to 'auto' for sidenav and grid */
+         @media screen and (max-width: 767px) {
+         .sidenav {
+         height: auto;
+         padding: 15px;
+         }
+         .row.content {height: auto;} 
+         }
+      </style>
+   </head>
+   <body>
+      <div style="background-color: #555;
+         color: white;
+         padding: 15px;">
+         <h1 style="display: inline">   Logs   </h1>
+         <h2 style="display: inline"> <a style="text-decoration: none" href="allAlarms">   Alarms   </a></h2>
+         {% if perms.alarmService.get_alarm_rules %}
+         <h2 style="display: inline"><a style="text-decoration: none" href="alarmRules">   Alarm Rules   </a></h2>
+         {% endif %}
+         <a href="/accounts/logout" class="btn btn-primary" role="button" style="float: right;">Logout</a>
+      </div>
+      <div class="container-fluid">
+         <div class="row content">
+            <div class="col-sm-3 sidenav">
+               <h4>Search Logs</h4>
+               <form action="getLogs" method="get">
+                  <input id="from" type="hidden" value="{{ fromlog }}" name="from"/>
+                  <input id="to" type="hidden" value="{{tolog}}" name="to"/>
+                  Facility:
+                  <br>
+                  <input class="form-control" type="text" name="facility" value="{{ facility }}" style="width:100%;"/>
+                  Severity:
+                  <br>
+                  <input class="form-control" type="text" name="severity" value="{{severity}}" style="width:100%;"/>
+                  Host name:
+                  <br>
+                  <input class="form-control" type="text" name="hostname" value="{{hostname}}" style="width:100%;"/>
+                  Application name:
+                  <br>
+                  <input class="form-control" type="text" name="appname" value="{{appname}}" style="width:100%;"/>
+                  Message ID:
+                  <br>
+                  <input class="form-control" type="text" name="msgid" value="{{msgid}}" style="width:100%;"/>
+                  Date from:
+                  <br>
+                  <input class="form-control" type="text" name="timestampfrom" style="width:100%;"/>
+                  Date to:
+                  <br>
+                  <input class="form-control" type="text" name="timestampto" style="width:100%;"/>
+                  <input class="btn btn-primary active" id="submit" type="submit" class="btn" value="Search" name="submit" style="width:100%;">
+               </form>
 
-	</div>
-</body>
+            </div>
+            <div class="col-sm-9">
+               <table class="table table-striped">
+                  <tr class="thead-dark">
+                     <th>Facility</th>
+                     <th>Severity</th>
+                     <th>Version</th>
+                     <th>Time stamp</th>
+                     <th>Host name</th>
+                     <th>Application name</th>
+                     <th>Proc ID</th>
+                     <th>Message ID</th>
+                     <th>Structured Data</th>
+                     <th>Message</th>
+                  </tr>
+                  {% for log in logs %}
+                  <tr>
+                     <td>{{ log.facility }}</td>
+                     <td>{{ log.severity }}</td>
+                     <td>{{ log.version }}</td>
+                     <td>{{ log.timestamp }}</td>
+                     <td>{{ log.hostname }}</td>
+                     <td>{{ log.appname }}</td>
+                     <td>{{ log.procid }}</td>
+                     <td>{{ log.msgid }}</td>
+                     <td>{{ log.structuredData }}</td>
+                     <td>{{ log.msg }}</td>
+                  </tr>
+                  {% endfor %}
+               </table>
+			   {% for i in total_pages %}
+               <input type="button" value="{{ i }}" onclick="fromTo('{{ i }}');">
+               {% endfor %}
+            </div>
+         </div>
+      </div>
+   </body>
 </html>

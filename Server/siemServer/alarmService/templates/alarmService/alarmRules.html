@@ -1,94 +1,110 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Alarm Logs</title>
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" />
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js">
-	
-	</script>
-</head>
-<body>
-	<div>
-		<h2 style="display: inline"><a href="getLogs">Logs</a></h2>
-		<h2 style="display: inline"><a href="allAlarms">Alarms</a></h2>
-		{% if perms.alarmService.get_alarm_rules %}
-		<h1 style="display: inline">Alarm Rules</h1>
-		{% endif %}
-		<a href="/accounts/logout" class="btn btn-primary" role="button" style="float: right;">Logout</a>
-	</div>
-	<br>
-	<div class="row">
-		<div class="col">
-			<h4>Create alarm rule</h4>
-			<form method = post action = "./generateAlarm">
-			
-				Regexp
-				<br>
-				<input name='regexp' style="width:100%;"/>
-				<br>
-				Text
-				<br>
-				<input name='text' style="width:100%;"/>
-				<br>
-				Type
-				<br>
-				<select name="type" style="width:100%;">
-				  <option value="Emergency">Emergency</option>
-				  <option value="Alert">Alert</option>
-				  <option value="Critical">Critical</option>
-				  <option value="Error">Error</option>
-				  <option value="Warning">Warning</option>
-				  <option value="Notice">Notice</option>
-				</select>
-				<br>
-				Repeat
-				<br>
-				<input name='repeat' pattern="[0-9.]+" style="width:100%;"/>
-				<br>
-				System specified
-				<input type="checkbox" name="sysspec"/>
-				<br>
-				Machine specified
-				<input type="checkbox" name="macspec"/>
-				<br>
-				Hours
-				<br>
-				<input name='hours' id='hours' pattern="[0-9.]+" style="width:100%;"/>
-				<br>
-				<input type="submit" value="Generate" style="width:100%;"/>
-
-			</form>
-		</div>
-		<div class="col-10">
-			<table class="table table-striped">
-				<tr class="thead-dark">
-					<th>Regexp</th>
-					<th>Text</th>
-					<th>Type</th>
-					<th>Repeat</th>
-					<th>System specified</th>
-					<th>Machine specified</th>
-					<th>Timed</th>
-					<th>Hours</th>
-					<th>Active</th>
-				</tr>
-			{% for alarm in alarmrules %}
-				<tr>
-					<td>{{ alarm.regexp }}</td>
-					<td>{{ alarm.text }}</td>
-					<td>{{ alarm.type }}</td>
-					<td>{{ alarm.repeat }}</td>
-					<td>{{ alarm.sysspec }}</td>
-					<td>{{ alarm.machinespec }}</td>
-					<td>{{ alarm.timed }}</td>
-					<td>{{ alarm.hours }}</td>
-					<td>{{ alarm.active }}</td>
-						   
-				</tr>
-			{% endfor %}
-			</table>
-		</div>
-	</div>
-</body>
+   <head>
+      <meta charset="UTF-8">
+      <title>Alarm Logs</title>
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" />
+      <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
+      <style>
+         /* Set height of the grid so .sidenav can be 100% (adjust if needed) */
+         .row.content {height: 1500px}
+         /* Set gray background color and 100% height */
+         .sidenav {
+         background-color: #f1f1f1;
+         height: 100%;
+         }
+         /* Set black background color, white text and some padding */
+         footer {
+         background-color: #555;
+         color: white;
+         padding: 15px;
+         }
+         /* On small screens, set height to 'auto' for sidenav and grid */
+         @media screen and (max-width: 767px) {
+         .sidenav {
+         height: auto;
+         padding: 15px;
+         }
+         .row.content {height: auto;} 
+         }
+      </style>
+   </head>
+   <body>
+      <div style="background-color: #555;
+      color: white;
+      padding: 15px;">
+         <h2 style="display: inline"><a style="text-decoration: none" href="getLogs">   Logs   </a></h2>
+         <h2 style="display: inline"><a style="text-decoration: none" href="allAlarms">   Alarms   </a></h2>
+         {% if perms.alarmService.get_alarm_rules %}
+         <h1 style="display: inline">   Alarm Rules   </h1>
+         {% endif %}
+         <a href="/accounts/logout" class="btn btn-primary" role="button" style="float: right;">Logout</a>
+      </div>
+      <div class="container-fluid">
+         <div class="row content">
+            <div class="col-sm-3 sidenav">
+               <h4>Create alarm rule</h4>
+               <form method = post action = "./generateAlarm">
+                  Regexp
+                  <br>
+                  <input class="form-control" name='regexp' style="width:100%;"/>
+                  Text
+                  <br>
+                  <input class="form-control" name='text' style="width:100%;"/>
+                  Type
+                  <br>
+                  <select class="form-control" name="type" style="width:100%;">
+                     <option value="Emergency">Emergency</option>
+                     <option value="Alert">Alert</option>
+                     <option value="Critical">Critical</option>
+                     <option value="Error">Error</option>
+                     <option value="Warning">Warning</option>
+                     <option value="Notice">Notice</option>
+                  </select>
+                  Repeat
+                  <br>
+                  <input class="form-control" name='repeat' pattern="[0-9.]+" style="width:100%;"/>
+                  System specified
+                  <input type="checkbox" name="sysspec"/>
+				  <br>
+                  Machine specified
+                  <input type="checkbox" name="macspec"/>
+				  <br>
+                  Hours
+                  <br>
+                  <input class="form-control" name='hours' id='hours' pattern="[0-9.]+" style="width:100%;"/>
+                  <input class="btn btn-primary active" type="submit" value="Generate" style="width:100%;"/>
+               </form>
+            </div>
+            <div class="col-sm-9 table-responsive">
+               <table class="table table-striped">
+                  <tr class="thead-dark">
+                     <th>Regexp</th>
+                     <th>Text</th>
+                     <th>Type</th>
+                     <th>Repeat</th>
+                     <th>System specified</th>
+                     <th>Machine specified</th>
+                     <th>Timed</th>
+                     <th>Hours</th>
+                     <th>Active</th>
+                  </tr>
+                  {% for alarm in alarmrules %}
+                  <tr>
+                     <td>{{ alarm.regexp }}</td>
+                     <td>{{ alarm.text }}</td>
+                     <td>{{ alarm.type }}</td>
+                     <td>{{ alarm.repeat }}</td>
+                     <td>{{ alarm.sysspec }}</td>
+                     <td>{{ alarm.machinespec }}</td>
+                     <td>{{ alarm.timed }}</td>
+                     <td>{{ alarm.hours }}</td>
+                     <td>{{ alarm.active }}</td>
+                  </tr>
+                  {% endfor %}
+               </table>
+            </div>
+         </div>
+      </div>
+   </body>
 </html>
