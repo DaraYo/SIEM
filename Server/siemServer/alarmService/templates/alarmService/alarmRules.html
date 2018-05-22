@@ -45,9 +45,21 @@
             <div class="col-sm-3 sidenav">
                <h4>Create alarm rule</h4>
                <form method = post action = "./generateAlarm">
-                  Regexp
+                  Facility regex
                   <br>
-                  <input class="form-control" name='regexp' style="width:100%;"/>
+                  <input class="form-control" name='regfacility' style="width:100%;"/>
+                  Severity regex
+                  <br>
+                  <input class="form-control" name='regseverity' style="width:100%;"/>
+                  Host name regex
+                  <br>
+                  <input class="form-control" name='reghostname' style="width:100%;"/>
+                  Application name regex
+                  <br>
+                  <input class="form-control" name='regappname' style="width:100%;"/>
+                  Message ID regex
+                  <br>
+                  <input class="form-control" name='regmsgid' style="width:100%;"/>
                   Text
                   <br>
                   <input class="form-control" name='text' style="width:100%;"/>
@@ -79,7 +91,11 @@
             <div class="col-sm-9 table-responsive">
                <table class="table table-striped">
                   <tr class="thead-dark">
-                     <th>Regexp</th>
+                     <th>Facility regex</th>
+					 <th>Severity regex</th>
+					 <th>Hostname regex</th>
+					 <th>Appname regex</th>
+					 <th>Message id regex</th>
                      <th>Text</th>
                      <th>Type</th>
                      <th>Repeat</th>
@@ -91,7 +107,11 @@
                   </tr>
                   {% for alarm in alarmrules %}
                   <tr>
-                     <td>{{ alarm.regexp }}</td>
+                     <td>{{ alarm.regfacility }}</td>
+					 <td>{{ alarm.regseverity }}</td>
+					 <td>{{ alarm.reghostname }}</td>
+					 <td>{{ alarm.regappname }}</td>
+					 <td>{{ alarm.regmsgid }}</td>
                      <td>{{ alarm.text }}</td>
                      <td>{{ alarm.type }}</td>
                      <td>{{ alarm.repeat }}</td>

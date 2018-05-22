@@ -24,7 +24,11 @@ def generateAlarm(request):
 	a = Alarm()
 	response = HttpResponse()
 	try:
-		a.regexp = request.POST.get('regexp')
+		a.regfacility = request.POST.get('regfacility')
+		a.regseverity = request.POST.get('regseverity')
+		a.reghostname = request.POST.get('reghostname')
+		a.regappname = request.POST.get('regappname')
+		a.regmsgid = request.POST.get('regmsgid')
 		a.text = request.POST.get('text')
 		a.type = request.POST.get('type')
 		a.repeat = request.POST.get('repeat')

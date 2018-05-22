@@ -4,14 +4,19 @@ from logService.models import Machine
 
 # Create your models here.
 class Alarm(models.Model):
-	regexp = models.CharField(max_length=100)
+	regfacility = models.CharField(max_length=100)
+	regseverity = models.CharField(max_length=100)
+	reghostname = models.CharField(max_length=100)
+	regappname = models.CharField(max_length=100)
+	regmsgid = models.CharField(max_length=100)
+	
 	text= models.CharField(max_length=1000)
-	Emergency=0
-	Alert=1
-	Critical=2
-	Error=3
-	Warning=4
-	Notice=5
+	Emergency='0'
+	Alert='1'
+	Critical='2'
+	Error='3'
+	Warning='4'
+	Notice='5'
 	Type_CHOICES = (
 		(Emergency, 'Emergency'),
 		(Alert, 'Alert'),
