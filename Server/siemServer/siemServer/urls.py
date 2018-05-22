@@ -28,4 +28,4 @@ urlpatterns = [
 	path('api/',include('alarmService.urls')),
 ]
 
-startup.start()
+#startup.start()

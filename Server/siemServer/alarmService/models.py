@@ -1,6 +1,6 @@
 from django.db import models
 
-from logService.models import Machine
+from logService.models import Log
 
 # Create your models here.
 class Alarm(models.Model):
@@ -29,8 +29,7 @@ class Alarm(models.Model):
 	type= models.CharField(max_length=1,choices = Type_CHOICES)
 	sysspec = models.BooleanField()
 	machinespec = models.BooleanField()
-	timed = models.BooleanField()
-	hours = models.SmallIntegerField(null=True)
+	minutes = models.SmallIntegerField()
 	active = models.BooleanField()
 
 	def __str__(self):
@@ -43,7 +42,7 @@ class Alarm(models.Model):
 class AlarmLog(models.Model):
     alarm = models.ForeignKey(Alarm,on_delete=models.CASCADE)
     time = models.DateTimeField()
-    machine = models.ForeignKey(Machine,null=True, on_delete=False)
+    logs = models.ManyToManyField(Log)
     seen = models.BooleanField()
     class Meta:
         permissions = (("get_alarms","Can see active alarms"),)
