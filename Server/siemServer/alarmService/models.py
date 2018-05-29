@@ -50,10 +50,12 @@ class AlarmLog(models.Model):
 
 class Report(models.Model):
     timestamp = models.DateTimeField(null=False)
-    numbOfSysLogs= models.SmallIntegerField()
-    numbOfMachLogs = models.SmallIntegerField()
-    numbOfSysAlarms = models.SmallIntegerField()
-    numbOfMachAlarms = models.SmallIntegerField()
+    numbOfAllLogs = models.BigIntegerField(default=0)
+    numbOfAllAlarms = models.BigIntegerField(default=0)
+    numbOfWinLogs= models.BigIntegerField(default=0)
+    numbOfLinLogs = models.BigIntegerField(default=0)
+    numbOfWinAlarms = models.BigIntegerField(default=0)
+    numbOfLinAlarms = models.BigIntegerField(default=0)
     class Meta:
         permissions = (("get_report","Can see report"),)
         #default permisije: add_report,change_report,delete_report 

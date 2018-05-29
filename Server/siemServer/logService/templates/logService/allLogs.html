@@ -44,7 +44,13 @@
          {% if perms.alarmService.get_alarm_rules %}
          <h2 style="display: inline"><a style="text-decoration: none" href="alarmRules">   Alarm Rules   </a></h2>
          {% endif %}
+         <h2 style="display: inline"><a href="/api/report" style="text-decoration: none">Report</a></h2>
          <a href="/accounts/logout" class="btn btn-primary" role="button" style="float: right;">Logout</a>
+      </div>
+      <div style="background-color: #808080;
+         color: white;
+         padding: 2px;">
+         <a href="/api/report" class="btn btn-info btn-sm" role="button" style="float: center;">Show yesterday's report</a>
       </div>
       <div class="container-fluid">
          <div class="row content">

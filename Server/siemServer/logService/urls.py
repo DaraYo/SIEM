@@ -6,5 +6,6 @@ from . import views
 urlpatterns = [
     path('log', views.log),
     url(r'^getLogs', views.getLogs),
+    path('report', views.report)
 	
 ]

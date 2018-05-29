@@ -4,37 +4,74 @@
     <meta charset="UTF-8">
     <title>Report</title>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" />
+	<script>
+         function fromTo(i) {
+         	document.getElementById("from").value = (i-1)*50;
+         	document.getElementById("to").value=i*50;
+         	document.getElementById("submit").click();
+         }
+      </script>
+	  <style>
+         /* Set height of the grid so .sidenav can be 100% (adjust if needed) */
+         .row.content {height: 1500px}
+         /* Set gray background color and 100% height */
+         .sidenav {
+         background-color: #f1f1f1;
+         height: 100%;
+         }
+         /* Set black background color, white text and some padding */
+         footer {
+         background-color: #555;
+         color: white;
+         padding: 15px;
+         }
+         /* On small screens, set height to 'auto' for sidenav and grid */
+         @media screen and (max-width: 767px) {
+         .sidenav {
+         height: auto;
+         padding: 15px;
+         }
+         .row.content {height: auto;}
+         }
+      </style>
 </head>
 <body>
-    <div>
-		<h2 style="display: inline">Logs</h2>
-		<h2 style="display: inline"> <a href="allAlarms">Alarms</a></h2>
+    <div style="background-color: #555;
+         color: white;
+         padding: 15px;">
+		<h2 style="display: inline"><a href="getLogs" style="text-decoration: none"> Logs</a></h2>
+		<h2 style="display: inline"> <a href="allAlarms" style="text-decoration: none">Alarms</a></h2>
 		{% if perms.alarmService.get_alarm_rules %}
 		<h2 style="display: inline"><a href="alarmRules">Alarm Rules</a></h2>
 		{% endif %}
-		<h1 style="display: inline"><a href="report">Report</a></h1>
+		<h1 style="display: inline">Report</h1>
         <a href="/accounts/logout" class="btn btn-primary" role="button" style="float: right;">Logout</a>
 	</div>
 	<br>
     <table class="table table-striped">
 				<tr class="thead-dark">
-					<th>Facility</th>
-					<th>Severity</th>
-					<th>Version</th>
-					<th>Time stamp</th>
-					<th>Host name</th>
-					<th>Application name</th>
-					<th>Proc ID</th>
-					<th>Message ID</th>
-					<th>Structured Data</th>
-					<th>Message</th>
+					<th rowspan="2">Date</th>
+					<th colspan="6">Number of</th>
+				</tr>
+				<tr class="thead-dark">
+					<th>All logs</th>
+					<th>All alarms</th>
+					<th>
+						Windows logs
+					</th>
+					<th>
+						Linux logs
+					</th>
+					<th>
+						Windows alarms
+					</th>
+					<th>
+						Linux alarms
+					</th>
 				</tr>
 				{% for report in reports %}
 				<tr>
-					<td>a</td>
-					<td>a</td>
-					<td>a</td>
-					<td>a</td>
+					<td>{{ report.timestamp }}</td>
 					<td>a</td>
 					<td>a</td>
 					<td>a</td>
@@ -43,5 +80,16 @@
 					<td>a</td>
 				</tr>
 				{% endfor %}
+			</table>
+	<table class="table table-striped">
+				<tr class="thead-dark">
+					<td>Total</td>
+					<td>a</td>
+					<td>a</td>
+					<td>a</td>
+					<td>a</td>
+					<td>a</td>
+					<td>a</td>
+				</tr>
 			</table>
 </body>

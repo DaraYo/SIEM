@@ -5,9 +5,11 @@ from django.contrib.auth.decorators import permission_required,login_required
 
 from datetime import datetime, timedelta
 import re
+import time
 import math
 from .models import Log,Machine
-#from alarmService.models import AlarmLog
+from alarmService.models import Report, AlarmLog
+from siemServer.settings import GENERATING_REPORT_TIME
 
 # Create your views here.
 def log(request):
@@ -93,3 +95,44 @@ def getLogs(request):
 		print("ERROR")
 		#Timestamp format was bad
 		return render(request, 'logService/allLogs.html', {'logs':[]})
+
+@login_required(login_url="/accounts/login")
+#@permission_required('logService.get_report')
+def report(request):
+	date= datetime.now()
+	try:
+		reports=[]
+		#reports= Report.objects.all()
+		#todaysReport= Report.objects.get(timestamp= date)
+		#logs=Log.objects.all()
+		#alarms=AlarmLog.objects.all()
+		#todaysReport.numbOfAllLogs= len(logs)
+		#todaysReport.numbOfAllAlarms= len(alarms)
+		#lmachine = request.GET.get('logmach') or ""
+		#lsystem = request.GET.get('logsys') or ""
+		#amachine = request.GET.get('almach') or ""
+		#asystem = request.GET.get('alsys') or ""
+		print("he")
+	except ValueError:
+		print("ERROR")
+	return render(request, 'logService/report.html', {'reports': reports})
+
+def reportGenerate():
+	logs = Log.objects.all()
+	alarms = AlarmLog.objects.all()
+	winLogs= logs.filter(machine__system= 'Windows')
+	lnxLogs = logs.filter(machine__system = 'Linux')
+	winAlarms = alarms.filter(logs__sysspec = True)
+	# lnxLogs = alarms.filter(machine__system = 'Linux')
+	print("hehe")
+
+def reportGeneratorRunner():
+	t1 = threading.Thread(target=reportGeneratorBeat)
+	t1.start()
+
+def reportGeneratorBeat():
+	while(reportGenerating):
+		time.sleep(GENERATING_REPORT_TIME)
+		reportGenerate()
+
+reportGenerating = True

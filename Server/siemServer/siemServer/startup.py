@@ -3,6 +3,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import IntegrityError
 
 from alarmService.views import alarmCheckRunner
+from logService.views import reportGeneratorRunner
 
 def start():
     groupO, created = Group.objects.get_or_create(name='operator')
@@ -43,3 +44,4 @@ def start():
     except IntegrityError:
         pass
     alarmCheckRunner()
+    reportGeneratorRunner()
