@@ -111,11 +111,16 @@
                      <td>{{ log.structuredData }}</td>
                      <td>{{ log.msg }}</td>
                   </tr>
-                  {% endfor %}
+				  {% endfor %}
                </table>
-			   {% for i in total_pages %}
-               <input type="button" value="{{ i }}" onclick="fromTo('{{ i }}');">
-               {% endfor %}
+				{% for i in total_pages %}
+					{% if currPage  == i %}
+                       <p>{{ i }}</p>
+					{% endif %}
+					{% if currPage != i %}
+                       <input type="button" value="{{ i }}" onclick="fromTo('{{ i }}');">
+					{% endif %}
+			    {% endfor %}
             </div>
          </div>
       </div>

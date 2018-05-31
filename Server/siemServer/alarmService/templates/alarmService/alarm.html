@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8">
+      <title>Alarm Logs</title>
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" />
+      <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
+      <style>
+         /* Set height of the grid so .sidenav can be 100% (adjust if needed) */
+         .row.content {height: 1500px}
+         /* Set gray background color and 100% height */
+         .sidenav {
+         background-color: #f1f1f1;
+         height: 100%;
+         }
+         /* Set black background color, white text and some padding */
+         footer {
+         background-color: #555;
+         color: white;
+         padding: 15px;
+         }
+         /* On small screens, set height to 'auto' for sidenav and grid */
+         @media screen and (max-width: 767px) {
+         .sidenav {
+         height: auto;
+         padding: 15px;
+         }
+         .row.content {height: auto;} 
+         }
+      </style>
+   </head>
+   <body>
+      <div style="background-color: #555;
+      color: white;
+      padding: 15px;">
+         <h2 style="display: inline"><a style="text-decoration: none" href="getLogs">   Logs   </a></h2>
+         <h2 style="display: inline"><a style="text-decoration: none" href="allAlarms">   Alarms   </a></h2>
+         {% if perms.alarmService.get_alarm_rules %}
+         <h1 style="display: inline">   Alarm Rules   </h1>
+         {% endif %}
+         <h2 style="display: inline"><a href="/api/report" style="text-decoration: none">Report</a></h2>
+         <a href="/accounts/logout" class="btn btn-primary" role="button" style="float: right;">Logout</a>
+      </div>
+      <div class="container-fluid">
+         <div class="row content">
+            <div class="col-sm-3 sidenav">
+
+            </div>
+            <div class="col-sm-9 table-responsive">
+               <table class="table table-striped">
+
+                  <tr class="thead-dark">
+					Alarm
+                  </tr>
+                  <tr>
+                     <td>Alarm info:</td>
+				  </tr>
+				  <tr>
+                     <td>{{ a.alarm }}</td>
+				  </tr>
+                  <tr>
+					 <td>Alarm actived on:</td>
+				  </tr>
+				  <tr>
+					 <td>{{ a.time }}</td>
+				  </tr>
+                  <tr>
+					 <td>Logs that activated alarm</td>
+				  </tr>
+				  <tr>
+					 <td>
+						<table class="table table-striped">
+						  <tr class="thead-dark">
+							 <th>Facility</th>
+							 <th>Severity</th>
+							 <th>Version</th>
+							 <th>Time stamp</th>
+							 <th>Host name</th>
+							 <th>Application name</th>
+							 <th>Proc ID</th>
+							 <th>Message ID</th>
+							 <th>Structured Data</th>
+							 <th>Message</th>
+						  </tr>
+						  {% for log in a.logs.all %}
+						  <tr>
+							 <td>{{ log.facility }}</td>
+							 <td>{{ log.severity }}</td>
+							 <td>{{ log.version }}</td>
+							 <td>{{ log.timestamp }}</td>
+							 <td>{{ log.hostname }}</td>
+							 <td>{{ log.appname }}</td>
+							 <td>{{ log.procid }}</td>
+							 <td>{{ log.msgid }}</td>
+							 <td>{{ log.structuredData }}</td>
+							 <td>{{ log.msg }}</td>
+						  </tr>
+						  {% endfor %}
+					   </table>
+					 </td>
+				  </tr>
+				  <tr>
+					 <td>Alarm seen:</td>
+				  </tr>
+                  <tr>
+					 <td>{{ a.seen }}</td>
+                  </tr>
+               </table>
+            </div>
+         </div>
+      </div>
+   </body>
+</html>

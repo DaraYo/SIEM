@@ -84,15 +84,15 @@ def getLogs(request):
 
 		logs = logs.filter(timestamp__range=(timestampF,timestampT))
 		#Nesto za paginaciju
+		currPage = tolog/50
 		logs_len=math.ceil(len(logs)/50)
 		total_pages=[]
 		for i in range(0,logs_len):
 			total_pages.append(i+1)
-		print(total_pages)
-		#
+
 		logs = logs[fromlog:tolog]
 
-		return render(request, 'logService/allLogs.html', {'logs':logs,'total_pages':total_pages,'fromlog':fromlog,'tolog':tolog,'facility':facility,'severity':severity,'hostname':hostname,'appname':appname,'msgid':msgid})
+		return render(request, 'logService/allLogs.html', {'logs':logs,'currPage':currPage,'total_pages':total_pages,'fromlog':fromlog,'tolog':tolog,'facility':facility,'severity':severity,'hostname':hostname,'appname':appname,'msgid':msgid})
 	except ValueError:
 		print("ERROR")
 		#Timestamp format was bad
