@@ -2,7 +2,7 @@ import time
 import threading
 from datetime import datetime,timedelta
 from collections import Counter
-
+import math
 from django.shortcuts import render
 from .models import AlarmLog,Alarm
 from django.views.decorators.csrf import csrf_exempt
@@ -15,11 +15,39 @@ from siemServer.settings import CHECK_EVERY_X_SECONDS
 
 # Create your views here.
 
-@login_required(login_url="/accounts/login")
-@permission_required('alarmService.get_alarms')
+#@login_required(login_url="/accounts/login")
+#@permission_required('alarmService.get_alarms')
 def getAlarmLogs(request):
+	#pages
+	fromalarm = int(request.GET.get('from') or "0")
+	toalarm = int(request.GET.get('to') or "50")
+	
+	#time
+	timestampF = request.GET.get('timestampfrom') or "None"
+	timestampT = request.GET.get('timestampto') or "None"
+	
 	alarms= AlarmLog.objects.all()
-	context= {'alarms': alarms}
+	
+	if(timestampF!='None'):
+		timestampF = datetime.strptime(timestampF,'%Y-%m-%dT%H:%M:%S.%f%z')
+	else:
+		timestampF = datetime.now() - timedelta(days=5)
+	if(timestampT!='None'):
+		timestampT = datetime.strptime(timestampT,'%Y-%m-%dT%H:%M:%S.%f%z')
+	else:
+		timestampT = datetime.now()
+		
+	alarms = alarms.filter(time__range=(timestampF,timestampT))
+	
+	
+	currPage = toalarm/50
+	alarms_len=math.ceil(len(alarms)/50)
+	total_pages=[]
+	for i in range(0,alarms_len):
+		total_pages.append(i+1)
+
+	alarms = alarms[fromalarm:toalarm]
+	context= {'alarms': alarms,'currPage':currPage,'total_pages':total_pages,'fromalarm':fromalarm,'toalarm':toalarm}
 	return render(request, 'alarmService/allAlarms.html', context)
 
 @csrf_exempt
@@ -70,6 +98,12 @@ def getAlarmRules(request):
 def createRule(request):
 	return render(request,'alarmService/createRule.html')
 
+def getAlarm(request):
+	alarmZ = AlarmLog.objects.get(pk=request.GET.get('id'))
+	context = {'a':alarmZ}
+	return render(request,'alarmService/alarm.html',context)
+	
+	
 def alarmCheck():
 	changed = False
 	coutner = Counter()
