@@ -7,6 +7,8 @@ from datetime import datetime, timedelta
 import re
 import time
 import math
+import threading
+
 from .models import Log,Machine
 from alarmService.models import Report, AlarmLog
 from siemServer.settings import GENERATING_REPORT_TIME
