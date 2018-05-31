@@ -72,10 +72,8 @@ def generateAlarm(request):
 		else:
 			a.machinespec = False
 		if request.POST.get('hours')=='':
-			a.timed = False
 			a.minutes = 0
 		else:
-			a.timed = True
 			a.minutes = eval(request.POST.get('hours'))
 		a.active = True
 		
@@ -99,10 +97,73 @@ def createRule(request):
 	return render(request,'alarmService/createRule.html')
 
 def getAlarm(request):
-	alarmZ = AlarmLog.objects.get(pk=request.GET.get('id'))
-	context = {'a':alarmZ}
-	return render(request,'alarmService/alarm.html',context)
+	response = HttpResponse()
+	try:
+		alarmZ = AlarmLog.objects.get(pk=request.GET.get('id'))
+		context = {'a':alarmZ}
+		return render(request,'alarmService/alarm.html',context)
+	except:
+		response.status_code = 406
+		return response
 	
+def alarmSeen(request):
+	response = HttpResponse()
+	try:
+		alarmZ = AlarmLog.objects.get(pk=request.GET.get('id'))
+		alarmZ.seen= True
+		alarmZ.save()
+		context = {'a':alarmZ}
+		return render(request,'alarmService/alarm.html',context)
+	except:
+		response.status_code = 406
+		return response
+
+def editAlarmRules(request):
+	response = HttpResponse()
+	try:
+		alarm=Alarm.objects.get(pk=request.GET.get('id'))
+		context={'alarm':alarm}
+		return render(request,'alarmService/editAlarmRules.html',context)
+	except:
+		response.status_code = 406
+		return response
+		
+@csrf_exempt
+def submitAlarmEdit(request):
+	response = HttpResponse()
+	try:
+		a=Alarm.objects.get(pk=request.POST.get('id'))
+		a.regfacility = request.POST.get('regfacility')
+		a.regseverity = request.POST.get('regseverity')
+		a.reghostname = request.POST.get('reghostname')
+		a.regappname = request.POST.get('regappname')
+		a.regmsgid = request.POST.get('regmsgid')
+		a.text = request.POST.get('text')
+		a.type = request.POST.get('type')
+		a.repeat = request.POST.get('repeat')
+		if(request.POST.get('sysspec')=='on'):
+			a.sysspec = True
+		else:
+			a.sysspec = False
+		if request.POST.get('macspec')=='on':
+			a.machinespec = True
+		else:
+			a.machinespec = False
+		if request.POST.get('hours')=='':
+			a.minutes = 0
+		else:
+			a.minutes = eval(request.POST.get('hours'))
+		if( request.POST.get('active')=='on'):
+			a.active=True
+		else:
+			a.active=False
+		
+		a.save()
+		#response.status_code = 200
+		return redirect('alarmRules')
+	except:
+		response.status_code = 406
+		return response
 	
 def alarmCheck():
 	changed = False

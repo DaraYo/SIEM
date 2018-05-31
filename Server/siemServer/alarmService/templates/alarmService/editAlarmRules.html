@@ -36,7 +36,7 @@
          <h2 style="display: inline"><a style="text-decoration: none" href="getLogs">   Logs   </a></h2>
          <h2 style="display: inline"><a style="text-decoration: none" href="allAlarms">   Alarms   </a></h2>
          {% if perms.alarmService.get_alarm_rules %}
-         <h1 style="display: inline">   Alarm Rules   </h1>
+         <h2 style="display: inline"><a style="text-decoration: none" href="alarmRules">   Alarm Rules   </a></h2>
          {% endif %}
          <h2 style="display: inline"><a href="/api/report" style="text-decoration: none">Report</a></h2>
          <a href="/accounts/logout" class="btn btn-primary" role="button" style="float: right;">Logout</a>
@@ -44,29 +44,32 @@
       <div class="container-fluid">
          <div class="row content">
             <div class="col-sm-3 sidenav">
-               <h4>Create alarm rule</h4>
-               <form method = post action = "./generateAlarm">
+
+            </div>
+            <div class="col-sm-9 table-responsive">
+               <h4>Edit alarm rule</h4>
+               <form method = post action = "./submitAlarmEdit">
                   Facility regex
                   <br>
-                  <input class="form-control" name='regfacility' style="width:100%;"/>
+                  <input class="form-control" name='regfacility' value={{ alarm.regfacility}} style="width:100%;"/>
                   Severity regex
                   <br>
-                  <input class="form-control" name='regseverity' style="width:100%;"/>
+                  <input class="form-control" name='regseverity' value={{ alarm.regseverity}} style="width:100%;"/>
                   Host name regex
                   <br>
-                  <input class="form-control" name='reghostname' style="width:100%;"/>
+                  <input class="form-control" name='reghostname' value={{ alarm.reghostname}} style="width:100%;"/>
                   Application name regex
                   <br>
-                  <input class="form-control" name='regappname' style="width:100%;"/>
+                  <input class="form-control" name='regappname' value={{ alarm.regappname}} style="width:100%;"/>
                   Message ID regex
                   <br>
-                  <input class="form-control" name='regmsgid' style="width:100%;"/>
+                  <input class="form-control" name='regmsgid' value={{ alarm.regmsgid}} style="width:100%;"/>
                   Text
                   <br>
-                  <input class="form-control" name='text' style="width:100%;"/>
+                  <input class="form-control" name='text' value={{ alarm.text}} style="width:100%;"/>
                   Type
                   <br>
-                  <select class="form-control" name="type" style="width:100%;">
+                  <select class="form-control" name="type" select={{ alarm.type }} style="width:100%;">
                      <option value="Emergency">Emergency</option>
                      <option value="Alert">Alert</option>
                      <option value="Critical">Critical</option>
@@ -76,59 +79,38 @@
                   </select>
                   Repeat
                   <br>
-                  <input class="form-control" name='repeat' pattern="[0-9.]+" style="width:100%;"/>
+                  <input class="form-control" name='repeat' value="{{ alarm.repeat}}" pattern="[0-9.]+" style="width:100%;"/>
+				  
                   System specified
-                  <input type="checkbox" name="sysspec"/>
+				  {% if alarm.sysspec == True %}
+					 <input type="checkbox"  name="sysspec" checked/>
+				  {% endif %}
+				  {% if alarm.sysspec == False %}
+				     <input type="checkbox"  name="sysspec"/>
+				  {% endif %}
 				  <br>
                   Machine specified
-                  <input type="checkbox" name="macspec"/>
+				  {% if alarm.machinespec == True %}
+					 <input type="checkbox"  name="macspec" checked/>
+				  {% endif %}
+				  {% if alarm.machinespec == False %}
+				     <input type="checkbox"  name="macspec"/>
+				  {% endif %}
 				  <br>
                   Hours
                   <br>
-                  <input class="form-control" name='hours' id='hours' pattern="[0-9.]+" style="width:100%;"/>
-                  <input class="btn btn-primary active" type="submit" value="Generate" style="width:100%;"/>
+                  <input class="form-control" value="{{ alarm.minutes }}" name='hours' id='hours' pattern="[0-9.]+" style="width:100%;"/>
+				  <br>
+                  Active
+				  {% if alarm.active == True %}
+					 <input type="checkbox"  name="active" checked/>
+				  {% endif %}
+				  {% if alarm.active == False %}
+				     <input type="checkbox"  name="active"/>
+				  {% endif %}
+				  <input type="hidden" value="{{ alarm.id }}" name="id" />
+                  <input class="btn btn-primary active" type="submit" value="Edit" style="width:100%;"/>
                </form>
-            </div>
-            <div class="col-sm-9 table-responsive">
-               <table class="table table-striped">
-                  <tr class="thead-dark">
-                     <th>Facility regex</th>
-					 <th>Severity regex</th>
-					 <th>Hostname regex</th>
-					 <th>Appname regex</th>
-					 <th>Message id regex</th>
-                     <th>Text</th>
-                     <th>Type</th>
-                     <th>Repeat</th>
-                     <th>System specified</th>
-                     <th>Machine specified</th>
-                     <th>Hours</th>
-                     <th>Active</th>
-					 <th>Edit</th>
-                  </tr>
-                  {% for alarm in alarmrules %}
-                  <tr>
-                     <td>{{ alarm.regfacility }}</td>
-					 <td>{{ alarm.regseverity }}</td>
-					 <td>{{ alarm.reghostname }}</td>
-					 <td>{{ alarm.regappname }}</td>
-					 <td>{{ alarm.regmsgid }}</td>
-                     <td>{{ alarm.text }}</td>
-                     <td>{{ alarm.type }}</td>
-                     <td>{{ alarm.repeat }}</td>
-                     <td>{{ alarm.sysspec }}</td>
-                     <td>{{ alarm.machinespec }}</td>
-                     <td>{{ alarm.minutes }}</td>
-                     <td>{{ alarm.active }}</td>
-					 <td>
-						 <form action="editAlarmRules" method="get">
-							<input type="hidden" value={{ alarm.id }} name="id" />
-							<input type="submit" class="btn" value="Edit" name="search" style="width:100%;">
-						 </form>
-					 </td>
-                  </tr>
-                  {% endfor %}
-               </table>
             </div>
          </div>
       </div>

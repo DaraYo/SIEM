@@ -36,7 +36,7 @@
          <h2 style="display: inline"><a style="text-decoration: none" href="getLogs">   Logs   </a></h2>
          <h2 style="display: inline"><a style="text-decoration: none" href="allAlarms">   Alarms   </a></h2>
          {% if perms.alarmService.get_alarm_rules %}
-         <h1 style="display: inline">   Alarm Rules   </h1>
+         <h2 style="display: inline"><a style="text-decoration: none" href="alarmRules">   Alarm Rules   </a></h2>
          {% endif %}
          <h2 style="display: inline"><a href="/api/report" style="text-decoration: none">Report</a></h2>
          <a href="/accounts/logout" class="btn btn-primary" role="button" style="float: right;">Logout</a>
@@ -103,7 +103,17 @@
 					 <td>Alarm seen:</td>
 				  </tr>
                   <tr>
-					 <td>{{ a.seen }}</td>
+					 <td>
+						{% if a.seen == False %}
+							<form action="alarmSeen" method="get">
+								<input type="hidden" value="{{ a.id }}" name="id" />
+								<input type="submit" class="btn" value="Info" name="search" style="width:100%;">
+							</form>
+						{% endif %}
+						{% if a.seen == True %}
+							<p>Seen</p>
+						{% endif %}
+					 </td>
                   </tr>
                </table>
             </div>
