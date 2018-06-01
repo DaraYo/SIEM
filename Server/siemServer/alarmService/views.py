@@ -129,7 +129,9 @@ def editAlarmRules(request):
 	except:
 		response.status_code = 406
 		return response
-		
+
+def alarmMonitoring(request):
+	return render(request,'alarmService/alarmMonitoring.html')
 @csrf_exempt
 def submitAlarmEdit(request):
 	response = HttpResponse()

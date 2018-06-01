@@ -4,7 +4,43 @@
       <meta charset="UTF-8">
       <title>Logs</title>
       <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" />
+	  <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
       <script>
+	     var websocket = new WebSocket("ws://127.0.0.1:6789/");
+		 websocket.onmessage = function (event) {
+			data = JSON.parse(event.data);
+			
+			$('#allAlarms').find('tr:gt(0)').remove();
+			$('#allAlarms').find('tr:eq(0)').remove();
+			$("#allAlarms").append(
+			    '<tr class="thead-dark">'+
+				'<th>Type</th>'+
+                     '<th>Time</th>'+
+                     '<th>Text</th>'+
+                     '<th>Info</th>'+
+			    '</tr>');
+					
+			 for (var it = 0; it < data.length; it++) {
+				appendAlarms(data[it]);
+			}
+		 }
+		 
+		 function appendAlarms(alarm)
+			{
+				$("#allAlarms").append(
+					'<tr>' + 
+						'<td>' + alarm.time + '</td>' +
+						'<td>' + alarm.type + '</td>' +
+						'<td>' + alarm.text + '</td>' +
+						'<td>' + 
+							'<form action="getAlarm" method="get">' + 
+								'<input type="hidden" value='+ alarm.id +' name="id" />' +
+								'<input type="submit" class="btn" value="Info" name="search" style="width:100%;">' +
+							'</form>' +
+						'</td>' +
+					'</tr>');
+		 
+			}
          function fromTo(i) {
          	document.getElementById("from").value = (i-1)*50;
          	document.getElementById("to").value=i*50;
@@ -41,8 +77,8 @@
          padding: 15px;">
          <h2 style="display: inline">
          <a href="getLogs" style="text-decoration: none">   Logs   </a></h2>
-         <h1 style="display: inline">   Alarms   </h1>
-		 <h1 style="display: inline"><a href="alarmMonitoring" style="text-decoration:none">   Alarm Monitoring   </a></h1>
+         <h2 style="display: inline"><a style="text-decoration: none" href="allAlarms">   Alarms   </a></h2>
+		 <h1 style="display: inline">   Alarm Monitoring   </h1>
          {% if perms.alarmService.get_alarm_rules %}
          <h2 style="display: inline"><a style="text-decoration: none" href="alarmRules">   Alarm Rules   </a></h2>
          {% endif %}
@@ -52,51 +88,11 @@
       <div class="container-fluid">
          <div class="row content">
             <div class="col-sm-3 sidenav">
-			  <h4>Search Logs</h4>
-			  <form action="getAlarmLogs" method="get">
-				  <input id="from" type="hidden" value="{{ fromalarm }}" name="from"/>
-                  <input id="to" type="hidden" value="{{toalarm}}" name="to"/>
-				  Date from:
-                  <br>
-                  <input class="form-control" type="text" name="timestampfrom" style="width:100%;"/>
-                  Date to:
-                  <br>
-                  <input class="form-control" type="text" name="timestampto" style="width:100%;"/>
-                  <input class="btn btn-primary active" id="submit" type="submit" class="btn" value="Search" name="submit" style="width:100%;">
-               </form>
             </div>
             <div class="col-sm-9">
-               <table class="table table-striped">
-                  <tr class="thead-dark">
-                     <th>Alarm</th>
-                     <th>Time</th>
-                     <th>Machine</th>
-                     <th>Resolved</th>
-					 <th></th>
-                  </tr>
-                  {% for alarm in alarms %}
-                  <tr>
-                     <td>{{ alarm.alarm }}</td>
-                     <td>{{ alarm.time }}</td>
-                     <td>{{ alarm.machine }}</td>
-                     <td>{{ alarm.seen }}</td>
-					 <td>
-						 <form action="getAlarm" method="get">
-							<input type="hidden" value={{ alarm.id }} name="id" />
-							<input type="submit" class="btn" value="Info" name="search" style="width:100%;">
-						 </form>
-					 </td>
-                  </tr>
-                  {% endfor %}
+               <table id="allAlarms" class="table table-striped">
+
                </table>
-			   {% for i in total_pages %}
-					{% if currPage  == i %}
-                       <p>{{ i }}</p>
-					{% endif %}
-					{% if currPage != i %}
-                       <input type="button" value="{{ i }}" onclick="fromTo('{{ i }}');">
-					{% endif %}
-			    {% endfor %}
             </div>
          </div>
       </div>
