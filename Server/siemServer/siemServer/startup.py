@@ -1,10 +1,43 @@
+import asyncio
+import json
+import websockets
+import threading
+import logging
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.db import IntegrityError
 
-from alarmService.views import alarmCheckRunner
+from alarmService.views import alarmCheckRunner, getAlarmingLogs
 from logService.views import reportGeneratorRunner
 
+#prep for web sockets
+USERS = set()
+
+async def notify_alarm_logs():
+    if USERS:       # asyncio.wait doesn't accept an empty list
+        message = getAlarmingLogs()
+        await asyncio.wait([user.send(message) for user in USERS])
+
+async def register(websocket):
+    USERS.add(websocket)
+    await notify_alarm_logs()
+
+async def unregister(websocket):
+    USERS.remove(websocket)
+
+async def alarmSocket(websocket, path):
+    await register(websocket)
+    print("New user at web socket(user count:"+ str(len(USERS)) +" )")
+    try:
+        await websocket.send(getAlarmingLogs())
+        async for message in websocket:
+            pass
+    finally:
+        await unregister(websocket)
+        print("User left web socket(user count:"+ str(len(USERS)) +" )")
+
+
+#startup
 def start():
     groupO, created = Group.objects.get_or_create(name='operator')
     if (created):
@@ -43,5 +76,22 @@ def start():
         user.save()
     except IntegrityError:
         pass
+    #start web socket
+    t1 = threading.Thread(target=webSocketThread)
+    t1.start()
+    #run other threads
     alarmCheckRunner()
     reportGeneratorRunner()
+
+def webSocketThread():
+    asyncio.set_event_loop(asyncio.new_event_loop())
+    '''#secure version
+    import ssl
+    ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+    ssl_context.load_cert_chain(pathlib.Path(__file__).with_name('localhost.pem'))
+
+    asyncio.get_event_loop().run_until_complete(websockets.serve(alarmSocket, 'localhost', 6789, ssl=ssl_context))
+    asyncio.get_event_loop().run_forever()
+    '''
+    asyncio.get_event_loop().run_until_complete(websockets.serve(alarmSocket, 'localhost', 6789))
+    asyncio.get_event_loop().run_forever()

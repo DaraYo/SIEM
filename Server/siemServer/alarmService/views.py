@@ -1,5 +1,6 @@
 import time
 import threading
+import json
 from datetime import datetime,timedelta
 from collections import Counter
 import math
@@ -11,7 +12,7 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required, permission_required
 
 from logService.models import Log
-from siemServer.settings import CHECK_EVERY_X_SECONDS
+import siemServer
 
 # Create your views here.
 
@@ -112,6 +113,7 @@ def alarmSeen(request):
 		alarmZ = AlarmLog.objects.get(pk=request.GET.get('id'))
 		alarmZ.seen= True
 		alarmZ.save()
+		siemServer.startup.notify_alarm_logs()
 		context = {'a':alarmZ}
 		return render(request,'alarmService/alarm.html',context)
 	except:
@@ -165,6 +167,20 @@ def submitAlarmEdit(request):
 		response.status_code = 406
 		return response
 	
+#Alarm checker area
+def getAlarmingLogs():
+	alarms= AlarmLog.objects.filter(seen=False)
+	listOfLogs = []
+	for alarmlog in alarms:
+		textOfAlarm = alarmlog.alarm.text
+		typeOfAlarm = alarmlog.alarm.type
+		timeOfAlarm = (alarmlog.time).strftime('%d.%m.%Y. %H:%M:%S.%f %z')
+		idOfLog = alarmlog.id
+		logObject = {"type":typeOfAlarm,"text":textOfAlarm,"time":timeOfAlarm,"id":idOfLog}
+		listOfLogs.append(logObject)
+	return json.dumps(listOfLogs)
+		
+
 def alarmCheck():
 	changed = False
 	coutner = Counter()
@@ -212,7 +228,7 @@ def alarmCheck():
 						if log.machine.system == celement[0]:
 							alarmlog.logs.add(log)
 	if changed:
-		print("Alarm se desio pokreni event da se obavesti korisnik koji osluskuje")
+		siemServer.startup.notify_alarm_logs()
 	
 def alarmCheckRunner():
 	t1 = threading.Thread(target=alarmCheckBeat)
@@ -220,7 +236,7 @@ def alarmCheckRunner():
 
 def alarmCheckBeat():
 	while(alarmBeatRunning):
-		time.sleep(CHECK_EVERY_X_SECONDS)
+		time.sleep(siemServer.settings.CHECK_EVERY_X_SECONDS)
 		alarmCheck()
 
 alarmBeatRunning = True
