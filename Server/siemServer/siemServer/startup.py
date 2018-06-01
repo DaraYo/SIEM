@@ -30,7 +30,7 @@ async def alarmSocket(websocket, path):
     print("New user at web socket(user count:"+ str(len(USERS)) +" )")
     try:
         await websocket.send(getAlarmingLogs())
-        async for message in websocket:
+        async for message in websocket:#keeps it connected
             pass
     finally:
         await unregister(websocket)

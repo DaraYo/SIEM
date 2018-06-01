@@ -9,7 +9,6 @@
 	     var websocket = new WebSocket("ws://127.0.0.1:6789/");
 		 websocket.onmessage = function (event) {
 			data = JSON.parse(event.data);
-			
 			$('#allAlarms').find('tr:gt(0)').remove();
 			$('#allAlarms').find('tr:eq(0)').remove();
 			$("#allAlarms").append(

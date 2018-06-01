@@ -1,6 +1,8 @@
 import time
 import threading
 import json
+import asyncio
+import websockets
 from datetime import datetime,timedelta
 from collections import Counter
 import math
@@ -113,7 +115,8 @@ def alarmSeen(request):
 		alarmZ = AlarmLog.objects.get(pk=request.GET.get('id'))
 		alarmZ.seen= True
 		alarmZ.save()
-		siemServer.startup.notify_alarm_logs()
+		t1 = threading.Thread(target=notifyChange)
+		t1.start()
 		context = {'a':alarmZ}
 		return render(request,'alarmService/alarm.html',context)
 	except:
@@ -230,7 +233,8 @@ def alarmCheck():
 						if log.machine.system == celement[0]:
 							alarmlog.logs.add(log)
 	if changed:
-		siemServer.startup.notify_alarm_logs()
+		t1 = threading.Thread(target=notifyChange)
+		t1.start()
 	
 def alarmCheckRunner():
 	t1 = threading.Thread(target=alarmCheckBeat)
@@ -240,5 +244,14 @@ def alarmCheckBeat():
 	while(alarmBeatRunning):
 		time.sleep(siemServer.settings.CHECK_EVERY_X_SECONDS)
 		alarmCheck()
+	
+async def change():
+	async with websockets.connect('ws://localhost:6789') as websocket:
+		#await websocket.send("whoa")
+		await websocket.recv()
+
+def notifyChange():
+	asyncio.set_event_loop(asyncio.new_event_loop())
+	asyncio.get_event_loop().run_until_complete(change())
 
 alarmBeatRunning = True
