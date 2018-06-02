@@ -18,8 +18,8 @@ import siemServer
 
 # Create your views here.
 
-#@login_required(login_url="/accounts/login")
-#@permission_required('alarmService.get_alarms')
+@login_required(login_url="/accounts/login")
+@permission_required('alarmService.get_alarms')
 def getAlarmLogs(request):
 	#pages
 	fromalarm = int(request.GET.get('from') or "0")
@@ -53,6 +53,8 @@ def getAlarmLogs(request):
 	context= {'alarms': alarms,'currPage':currPage,'total_pages':total_pages,'fromalarm':fromalarm,'toalarm':toalarm}
 	return render(request, 'alarmService/allAlarms.html', context)
 
+@login_required(login_url="/accounts/login")
+@permission_required('alarmService.add_alarm')
 @csrf_exempt
 def generateAlarm(request):
 	a = Alarm()
@@ -99,6 +101,8 @@ def getAlarmRules(request):
 def createRule(request):
 	return render(request,'alarmService/createRule.html')
 
+@login_required(login_url="/accounts/login")
+@permission_required('alarmService.get_alarm_rules')
 def getAlarm(request):
 	response = HttpResponse()
 	try:
@@ -109,6 +113,8 @@ def getAlarm(request):
 		response.status_code = 406
 		return response
 	
+@login_required(login_url="/accounts/login")
+@permission_required('alarmService.change_alarm')
 def alarmSeen(request):
 	response = HttpResponse()
 	try:
@@ -123,6 +129,8 @@ def alarmSeen(request):
 		response.status_code = 406
 		return response
 
+@login_required(login_url="/accounts/login")
+@permission_required('alarmService.change_alarm')
 def editAlarmRules(request):
 	response = HttpResponse()
 	try:
@@ -133,8 +141,13 @@ def editAlarmRules(request):
 		response.status_code = 406
 		return response
 
+@login_required(login_url="/accounts/login")
+@permission_required('alarmService.get_alarms')
 def alarmMonitoring(request):
 	return render(request,'alarmService/alarmMonitoring.html')
+
+@login_required(login_url="/accounts/login")
+@permission_required('alarmService.change_alarm')
 @csrf_exempt
 def submitAlarmEdit(request):
 	response = HttpResponse()
@@ -185,7 +198,6 @@ def getAlarmingLogs():
 		listOfLogs.append(logObject)
 	return json.dumps(listOfLogs)
 		
-
 def alarmCheck():
 	changed = False
 	coutner = Counter()
@@ -247,7 +259,6 @@ def alarmCheckBeat():
 	
 async def change():
 	async with websockets.connect('ws://localhost:6789') as websocket:
-		#await websocket.send("whoa")
 		await websocket.recv()
 
 def notifyChange():
