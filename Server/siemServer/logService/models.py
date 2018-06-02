@@ -26,7 +26,7 @@ class Log(models.Model):
 	msg = models.TextField()
 	machine = models.ForeignKey(Machine, on_delete=models.CASCADE)
 	class Meta:
-		ordering = ["-timestamp","-severity"]
+		ordering = ["-timestamp","-severity", "appname"]
 		get_latest_by = ["-timestamp"]
 		permissions = (("get_log","Can see list of logs"),)
 		#default permisije: add_log,change_log,delete_log 
@@ -37,4 +37,3 @@ class Log(models.Model):
             models.Index(fields=['-timestamp'], name='timestamp_idx'),
         ]
 
-	

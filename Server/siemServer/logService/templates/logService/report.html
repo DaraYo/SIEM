@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Report</title>
+	<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+	<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" />
 	<script>
          function fromTo(i) {
@@ -10,30 +14,132 @@
          	document.getElementById("to").value=i*50;
          	document.getElementById("submit").click();
          }
-      </script>
+
+         $(function(){
+			$( '.dropdown-menu li' ).on( 'click', function( event ) {
+				var $checkbox = $(this).find('.checkbox');
+				if (!$checkbox.length) {
+					return;
+				}
+				var $input = $checkbox.find('input');
+				var $icon = $checkbox.find('span.glyphicon');
+				if ($input.is(':checked')) {
+					$input.prop('checked',false);
+					$icon.removeClass('glyphicon-check').addClass('glyphicon-unchecked')
+				} else {
+					$input.prop('checked',true);
+					$icon.removeClass('glyphicon-unchecked').addClass('glyphicon-check')
+				}
+				return false;
+			});
+		});
+
+         function sortTable(n) {
+			  var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+			  table = document.getElementById("myTable");
+			  switching = true;
+			  // Set the sorting direction to ascending:
+			  dir = "asc";
+			  /* Make a loop that will continue until
+			  no switching has been done: */
+			  while (switching) {
+				// Start by saying: no switching is done:
+				switching = false;
+				rows = table.getElementsByTagName("TR");
+				/* Loop through all table rows (except the
+				first, which contains table headers): */
+				for (i= 2; i < (rows.length - 1); i++) {
+				  // Start by saying there should be no switching:
+				  shouldSwitch = false;
+				  /* Get the two elements you want to compare,
+				  one from current row and one from the next: */
+				  x = rows[i].getElementsByTagName("TD")[n];
+				  y = rows[i + 1].getElementsByTagName("TD")[n];
+				  /* Check if the two rows should switch place,
+				  based on the direction, asc or desc: */
+				  if (dir == "asc") {
+					if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+					  // If so, mark as a switch and break the loop:
+					  shouldSwitch = true;
+					  break;
+					}
+				  } else if (dir == "desc") {
+					if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+					  // If so, mark as a switch and break the loop:
+					  shouldSwitch = true;
+					  break;
+					}
+				  }
+				}
+				if (shouldSwitch) {
+				  /* If a switch has been marked, make the switch
+				  and mark that a switch has been done: */
+				  rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+				  switching = true;
+				  // Each time a switch is done, increase this count by 1:
+				  switchcount ++;
+				} else {
+				  /* If no switching has been done AND the direction is "asc",
+				  set the direction to "desc" and run the while loop again. */
+				  if (switchcount == 0 && dir == "asc") {
+					dir = "desc";
+					switching = true;
+				  }
+				}
+			  }
+			}
+	  </script>
 	  <style>
-         /* Set height of the grid so .sidenav can be 100% (adjust if needed) */
-         .row.content {height: 1500px}
-         /* Set gray background color and 100% height */
-         .sidenav {
-         background-color: #f1f1f1;
-         height: 100%;
-         }
-         /* Set black background color, white text and some padding */
-         footer {
-         background-color: #555;
-         color: white;
-         padding: 15px;
-         }
-         /* On small screens, set height to 'auto' for sidenav and grid */
-         @media screen and (max-width: 767px) {
-         .sidenav {
-         height: auto;
-         padding: 15px;
-         }
-         .row.content {height: auto;}
-         }
-      </style>
+		 /* Set height of the grid so .sidenav can be 100% (adjust if needed) */
+		 .row.content {height: 1500px}
+		 /* Set gray background color and 100% height */
+		 .sidenav {
+		 background-color: #f1f1f1;
+		 height: 100%;
+		 }
+		 /* Set black background color, white text and some padding */
+		 footer {
+		 background-color: #555;
+		 color: white;
+		 padding: 15px;
+		 }
+		 /* On small screens, set height to 'auto' for sidenav and grid */
+		 @media screen and (max-width: 767px) {
+		 .sidenav {
+		 height: auto;
+		 padding: 15px;
+		 }
+		 .row.content {height: auto;}
+		 }
+
+		 .dropdown-menu > li > .dropdown-menu-item {
+			   clear: both;
+				color: #333;
+				display: block;
+				padding: 3px 20px;
+				white-space: nowrap;
+				margin: 5px 0;
+				width: 100%;
+				text-align: left;
+				text-decoration: none;
+				outline: none;
+				cursor: pointer;
+				-moz-user-select: none;
+				user-select: none;
+			}
+			.dropdown-menu > li:hover .dropdown-menu-item,
+			.dropdown-menu > li:focus .dropdown-menu-item{
+				background-color: #f5f5f5;
+				color: #262625;
+			}
+			.dropdown-menu > li > .dropdown-menu-item.checkbox {
+				margin: 0;
+				font-weight: normal;
+			}
+			.dropdown-menu > li > .dropdown-menu-item.checkbox input {
+				display: none;
+			}
+	  </style>
 </head>
 <body>
     <div style="background-color: #555;
@@ -47,49 +153,100 @@
 		<h1 style="display: inline">Report</h1>
         <a href="/accounts/logout" class="btn btn-primary" role="button" style="float: right;">Logout</a>
 	</div>
-	<br>
-    <table class="table table-striped">
-				<tr class="thead-dark">
-					<th rowspan="2">Date</th>
-					<th colspan="6">Number of</th>
-				</tr>
-				<tr class="thead-dark">
-					<th>All logs</th>
-					<th>All alarms</th>
-					<th>
-						Windows logs
-					</th>
-					<th>
-						Linux logs
-					</th>
-					<th>
-						Windows alarms
-					</th>
-					<th>
-						Linux alarms
-					</th>
-				</tr>
-				{% for report in reports %}
-				<tr>
-					<td>{{ report.timestamp }}</td>
-					<td>a</td>
-					<td>a</td>
-					<td>a</td>
-					<td>a</td>
-					<td>a</td>
-					<td>a</td>
-				</tr>
-				{% endfor %}
-			</table>
-	<table class="table table-striped">
-				<tr class="thead-dark">
-					<td>Total</td>
-					<td>a</td>
-					<td>a</td>
-					<td>a</td>
-					<td>a</td>
-					<td>a</td>
-					<td>a</td>
-				</tr>
-			</table>
+	<div class="container-fluid">
+         <div class="row content">
+           <div class="col-sm-3 sidenav">
+				<h4>Predefined report for</h4>
+               <form action="report" method="get">
+				   <div class="row">
+					   Machines
+					 <div class="btn-group">
+						<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-cog"></span></button>
+						<ul class="dropdown-menu" name="cb1">
+							{% for machine in machines %}
+						   <li >
+							   <label class="dropdown-menu-item checkbox">
+								   <input type="checkbox"  value="{{ machine.ip }}"/>
+								   <span class="glyphicon glyphicon-unchecked"></span>
+								   {{ machine.ip }}
+							   </label>
+						   </li>
+							{% endfor %}
+						</ul>
+					 </div>
+				   </div>
+				   <div class="row">
+					   Applications
+					 <div class="btn-group">
+						<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-cog"></span></button>
+						<ul class="dropdown-menu">
+							{% for app in apps %}
+						   <li>
+							   <label class="dropdown-menu-item checkbox">
+								   <input type="checkbox" name="cb2" value="{{ app }}"/>
+								   <span class="glyphicon glyphicon-unchecked"></span>
+								   {{ app }}
+							   </label>
+						   </li>
+							{% endfor %}
+						</ul>
+					 </div>
+				   </div>
+                  Date from:
+                  <br>
+                  <input class="form-control" type="text" name="timestampfrom" style="width:100%;"/>
+                  Date to:
+                  <br>
+                  <input class="form-control" type="text" name="timestampto" style="width:100%;"/>
+                  <input class="btn btn-primary active" id="submit" type="submit" class="btn" value="Generate" name="submit" style="width:100%;">
+               </form>
+			</div>
+			<div class="col-sm-9">
+				<table align="center" class="table table-striped" style="table-layout:fixed" id="myTable">
+					<tr align="center" class="thead-dark">
+						<th rowspan="2" onclick="sortTable(0)">Date</th>
+						<th colspan="6">Number of</th>
+					</tr>
+					<tr align="center" class="thead-dark">
+						<th onclick="sortTable(1)">All logs</th>
+						<th onclick="sortTable(2)">All alarms</th>
+						<th onclick="sortTable(3)">
+							Windows logs
+						</th>
+						<th onclick="sortTable(4)">
+							Linux logs
+						</th>
+						<th onclick="sortTable(5)">
+							Windows alarms
+						</th>
+						<th onclick="sortTable(6)">
+							Linux alarms
+						</th>
+					</tr>
+					{% for report in reports %}
+					<tr>
+						<td>{{ report.timestamp }}</td>
+						<td>{{ report.numbOfAllLogs }}</td>
+						<td>{{ report.numbOfAllAlarms }}</td>
+						<td>{{ report.numbOfWinLogs }}</td>
+						<td>{{ report.numbOfLinLogs }}</td>
+						<td>{{ report.numbOfWinAlarms }}</td>
+						<td>{{ report.numbOfLinAlarms }}</td>
+					</tr>
+					{% endfor %}
+				</table>
+				<table class="table table-striped" style="table-layout:fixed">
+					<tr align="center" class="thead-dark">
+						<td>Total</td>
+						<td>{{ total.numbOfAllLogs__sum }}</td>
+						<td>{{ total.numbOfAllAlarms__sum }}</td>
+						<td>{{ total.numbOfWinLogs__sum }}</td>
+						<td>{{ total.numbOfLinLogs__sum }}</td>
+						<td>{{ total.numbOfWinAlarms__sum }}</td>
+						<td>{{ total.numbOfLinAlarms__sum }}</td>
+					</tr>
+				</table>
+			</div>
+		 </div>
+	</div>
 </body>

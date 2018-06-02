@@ -58,4 +58,4 @@ class Report(models.Model):
     numbOfLinAlarms = models.BigIntegerField(default=0)
     class Meta:
         permissions = (("get_report","Can see report"),)
-        #default permisije: add_report,change_report,delete_report 
+        #default permisije: add_report,change_report,delete_report

@@ -8,7 +8,7 @@ import re
 import time
 import math
 import threading
-
+from django.db.models import Sum
 from .models import Log,Machine
 from alarmService.models import Report, AlarmLog
 from siemServer.settings import GENERATING_REPORT_TIME
@@ -103,29 +103,70 @@ def getLogs(request):
 def report(request):
 	date= datetime.now()
 	try:
-		reports=[]
-		#reports= Report.objects.all()
-		#todaysReport= Report.objects.get(timestamp= date)
-		#logs=Log.objects.all()
-		#alarms=AlarmLog.objects.all()
-		#todaysReport.numbOfAllLogs= len(logs)
-		#todaysReport.numbOfAllAlarms= len(alarms)
-		#lmachine = request.GET.get('logmach') or ""
-		#lsystem = request.GET.get('logsys') or ""
-		#amachine = request.GET.get('almach') or ""
-		#asystem = request.GET.get('alsys') or ""
-		print("he")
+		if request.GET:
+			print('aaaaaaaa')
+			selectedMachines = request.GET.get('cb1') or ""
+			selectedApps = request.GET.get('cb2') or ""
+			timestampF = request.GET.get('timestampfrom') or "None"
+			timestampT = request.GET.get('timestampto') or "None"
+			nForMach = 0
+			tForApps = 0
+			if (timestampF != 'None'):
+				timestampF = datetime.strptime(timestampF, '%Y-%m-%dT%H:%M:%S.%f%z')
+			else:
+				timestampF = datetime.now() - timedelta(days=5)
+			if (timestampT != 'None'):
+				timestampT = datetime.strptime(timestampT, '%Y-%m-%dT%H:%M:%S.%f%z')
+			else:
+				timestampT = datetime.now()
+
+			logs = Log.objects.filter(timestamp__range=(timestampF, timestampT))
+			for m in selectedMachines:
+				nForMach += len(logs.filter(machine__ip=m))
+			for t in selectedApps:
+				tForApps += len(logs.filter(appname=t))
+		#reports=[]
+		machines= Machine.objects.all()
+		apps= Log.objects.order_by().values_list('appname').distinct()
+		reports= Report.objects.all()
+		total=reports.aggregate(Sum('numbOfAllLogs'), Sum('numbOfAllAlarms'), Sum('numbOfWinLogs'), Sum('numbOfLinLogs'), Sum('numbOfWinAlarms'), Sum('numbOfLinAlarms'))
 	except ValueError:
 		print("ERROR")
-	return render(request, 'logService/report.html', {'reports': reports})
+	return render(request, 'logService/report.html', {'reports': reports, 'machines': machines, 'apps': apps, 'total': total})
+
+@login_required(login_url="/accounts/login")
+#@permission_required('logService.get_report')
+def predefineReport(request):
+	try:
+		selectedMachines= request.GET.get('cb1') or ""
+		selectedApps = request.GET.get('cb2') or ""
+		timestampF = request.GET.get('timestampfrom') or "None"
+		timestampT = request.GET.get('timestampto') or "None"
+		nForMach=0
+		tForApps= 0
+		for m in selectedMachines:
+			nForMach+=len(Log.objects.filter(machine__ip= m))
+		#machineValues= sum(nForMach.values())
+		for t in selectedApps:
+			tForApps+=len(Log.objects.filter(appname= t))
+		#appsValues = sum(tForApps.values())
+	except ValueError:
+		print("ERROR")
+	return render(request, 'logService/report.html')
 
 def reportGenerate():
+	print("hehe")
 	logs = Log.objects.all()
 	alarms = AlarmLog.objects.all()
-	winLogs= logs.filter(machine__system= 'Windows')
-	lnxLogs = logs.filter(machine__system = 'Linux')
-	winAlarms = alarms.filter(logs__sysspec = True)
-	# lnxLogs = alarms.filter(machine__system = 'Linux')
+	#reports= Report.objects.all()
+	winLogs= len(logs.filter(machine__system= 'Windows'))
+	lnxLogs = len(logs.filter(machine__system = 'Linux'))
+	winAlarms = len(alarms.filter(logs__machine_system = 'Windows'))
+	lnxAlarms = len(alarms.filter(logs__machine_system = 'Linux'))
+	report = Report.objects.create(timestamp=datetime.now(), numbOfAllLogs=logs, numbOfAllAlarms=alarms,
+									numbOfWinLogs=winLogs,numbOfLinLogs=lnxLogs,
+									numbOfWinAlarms=winAlarms, numbOfLinAlarms=lnxAlarms)
+	report.save()
 	print("hehe")
 
 def reportGeneratorRunner():
@@ -134,7 +175,7 @@ def reportGeneratorRunner():
 
 def reportGeneratorBeat():
 	while(reportGenerating):
-		time.sleep(GENERATING_REPORT_TIME)
 		reportGenerate()
+		time.sleep(GENERATING_REPORT_TIME)
 
 reportGenerating = True
