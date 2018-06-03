@@ -18,7 +18,7 @@ def main():
 	messages_dict={}
 	#Regex filter
 	r = re.compile(filter)
-
+	log_list=[]
 	#Formiranje dicta
 	for ldl in config:
 		log_list=glob.glob(ldl+"/*.log")
@@ -29,7 +29,7 @@ def main():
 			#fname=log.split('\\')
 			#messages_dict[fname[len(fname)-1]]=len(log_messages)
 			messages_dict[log]=len(log_messages)
-	print(len(messages_dict))
+
 	while True:
 		facility_l=[]
 		severity_l=[]
@@ -43,8 +43,8 @@ def main():
 		msg_l=[]
 		sys.stdout.flush()
 		time.sleep(eval(timer))
-		for ldl in config:
-			log_list=glob.glob(ldl+"/*.log")
+		#for ldl in config:
+		#	log_list=glob.glob(ldl+"/*.log")
 			for log in log_list:
 				log_file=open(log,"r")
 				log_messages=log_file.readlines()
@@ -53,11 +53,7 @@ def main():
 				if messages_dict[log]<len(log_messages):
 					for i in range(messages_dict[log],len(log_messages)):
 						#Ovo treba prepraviti da radi sa regex
-						print("OVDE2")
-						print(log_messages[i])
-						
 						if r.match(log_messages[i]):	
-							print("OVDE")
 							parts = log_messages[i].split(" ")
 							PRIVERS = parts[0].split(">")
 							PRI = PRIVERS[0].split("<")[1]
@@ -83,10 +79,10 @@ def main():
 								MSG=SDATAMSG.split("]")[1]
 							else:
 								DATA=SDATAMSG.split(" ")
-							SDATA=DATA[0]
-							MSG=""
-							for i in range(1,len(DATA)):
-								MSG=MSG+" "+DATA[i]
+								SDATA=DATA[0]
+								MSG=""
+								for i in range(1,len(DATA)):
+									MSG=MSG+" "+DATA[i]
 							MSG=MSG.strip()
 							facility_l.append(FACILITY)
 							severity_l.append(SEVERITY)
@@ -103,7 +99,7 @@ def main():
 		if len(msg_l)!=0:
 			print("Sent "+str(len(msg_l))+" messages to server")
 			payload={'counter':counter,'facility':facility_l,'severity':severity_l,'version':version_l,'timestamp':timestamp_l,'hostname':hostname_l,'appname':appname_l,'procid':procid_l,'msgid':msgid_l,'structuredData':sdata_l,'msg':msg_l}
-			#requests.post(centralAgent,data=payload)
+			requests.post(centralAgent,json=payload)
 			counter+=1
 			f = open("config.config","w")
 			print(counter,file=f)
