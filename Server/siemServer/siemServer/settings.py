@@ -134,5 +134,5 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 
 #Alarm notification beat
-CHECK_EVERY_X_SECONDS = 10
+CHECK_EVERY_X_SECONDS = 30
 GENERATING_REPORT_TIME= 43200

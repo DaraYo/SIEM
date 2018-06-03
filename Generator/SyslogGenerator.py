@@ -4,13 +4,13 @@ import os
 from collections import Counter
 from time import sleep,strftime,localtime
 
-NOOFUSERS = 1
+NOOFUSERS = 10
 
 FREQUENCY = {'min': 10,'max':15}#time in secounds
 USERSPEED = {'min': 1,'max':5}#time in secounds
 
-MINFUNCTIONS = 0
-MAXFUNCTIONS = 10
+MINFUNCTIONS = 1
+MAXFUNCTIONS = 3
 
 DOCCHANCE = Counter(A=170,B=100,C=130,D=120,E=100,F=50,G=25,H=25,I=50,J=100,K=5,L=5,M=5,N=5,O=5,P=5,Q=75,R=25)#1000 total
 ADMINCHANCE = Counter(A=10,B=10,C=10,D=10,E=10,F=10,G=10,H=10,I=10,J=10,K=200,L=100,M=100,N=200,O=150,P=150,Q=0,R=0)#1000 total

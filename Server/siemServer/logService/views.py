@@ -8,36 +8,41 @@ import re
 import time
 import math
 import threading
+import json
 from django.db.models import Sum
 from .models import Log,Machine
 from alarmService.models import Report, AlarmLog
 from siemServer.settings import GENERATING_REPORT_TIME
 
 # Create your views here.
+@csrf_exempt
 def log(request):
 	#whitelist ip
+	body = json.loads(request.body)
 	ip_address = request.META.get('HTTP_X_FORWARDED_FOR') or request.META.get('REMOTE_ADDR')
 	#get machine
 	machine = Machine.objects.get(ip = ip_address)
-	counter = int(request.POST.get('counter'))
+	counter = int(body['counter'])
+	response = HttpResponse()
 	if (machine==None):
-		return
+		response.status_code = 404
+		return response
 	#counter check
 	if (machine.counter!=counter):
-		return
-	response = HttpResponse()
+		response.status_code = 404
+		return response
 	machine.counter = machine.counter + 1
 	machine.save()
-	facilityList = request.POST.get('facility')
-	severityList = request.POST.get('severity')
-	versionList = request.POST.get('version')
-	timestampList = request.POST.get('timestamp')
-	hostnameList = request.POST.get('hostname')
-	appnameList = request.POST.get('appname')
-	procidList = request.POST.get('procid')
-	msgidList = request.POST.get('msgid')
-	structuredDataList = request.POST.get('structuredData')
-	msgList = request.POST.get('msg')
+	facilityList = body['facility']
+	severityList = body['severity']
+	versionList = body['version']
+	timestampList = body['timestamp']
+	hostnameList = body['hostname']
+	appnameList = body['appname']
+	procidList = body['procid']
+	msgidList = body['msgid']
+	structuredDataList = body['structuredData']
+	msgList = body['msg']
 	try:
 		for i in range(0,len(facilityList)):
 			if(timestampList[i]!='NILVALUE'):

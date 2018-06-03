@@ -3,6 +3,7 @@ import threading
 import json
 import asyncio
 import websockets
+import pytz
 from datetime import datetime,timedelta
 from collections import Counter
 import math
@@ -34,11 +35,11 @@ def getAlarmLogs(request):
 	if(timestampF!='None'):
 		timestampF = datetime.strptime(timestampF,'%Y-%m-%dT%H:%M:%S.%f%z')
 	else:
-		timestampF = datetime.now() - timedelta(days=5)
+		timestampF = datetime.now(pytz.utc) - timedelta(days=5)
 	if(timestampT!='None'):
 		timestampT = datetime.strptime(timestampT,'%Y-%m-%dT%H:%M:%S.%f%z')
 	else:
-		timestampT = datetime.now()
+		timestampT = datetime.now(pytz.utc)
 		
 	alarms = alarms.filter(time__range=(timestampF,timestampT))
 	
@@ -200,53 +201,96 @@ def getAlarmingLogs():
 		
 def alarmCheck():
 	changed = False
-	coutner = Counter()
+	counter = Counter()
 	alarmRules = Alarm.objects.filter(active=True)
 	for alarmRule in alarmRules:
+		counter.clear()
 		facility = alarmRule.regfacility
 		severity = alarmRule.regseverity
 		hostname = alarmRule.reghostname
 		appname = alarmRule.regappname
 		msgid = alarmRule.regmsgid
-		timestampT = datetime.now()
-		timestampF = datetime.now() - timedelta(minutes=alarmRule.minutes)
+		timestampT = datetime.now(pytz.utc)
+		timestampF = datetime.now(pytz.utc) - timedelta(minutes=alarmRule.minutes)
 		#logovi se ne pribavljaju iz baze dok nisu potrebni, tako da je kod ispod koji se sastoji od vise filtriranja ekvivalentan 1 pozivanju iz baze
 		logs = Log.objects.filter(facility__iregex=facility,severity__iregex=severity,hostname__iregex=hostname, appname__iregex=appname, msgid__iregex=msgid)
 		logs = logs.filter(timestamp__range=(timestampF,timestampT))
-		if alarmRule.machinespec:
+		if alarmRule.machinespec:#machine specific
 			for log in logs:
-				coutner[log.machine.id] += 1#mozda moze samo log.machine ali tesko
+				counter[log.machine.id] += 1
 			for celement in counter.items():
 				if celement[1]>=alarmRule.repeat:
-					alarmlog = AlarmLog.objects.create(alarm=alarmRule,time=datetime.now(),seen=False)
-					alarmlog.save()
-					changed = True
-					for log in logs:
-						if log.machine.id == celement[0]:
-							alarmlog.logs.add(log)
-		else:
-			if alarmRule.sysspec:
-				for log in logs:
-					coutner[log.machine.system] += 1#mozda moze samo log.machine ali tesko
-				for celement in counter.items():
-					if celement[1]>=alarmRule.repeat:
-						alarmlog = AlarmLog.objects.create(alarm=alarmRule,time=datetime.now(),seen=False)
+					#dodati dodatne provere
+					existingAlarmLog = AlarmLog.objects.filter(alarm__id=alarmRule.id,time__range=(timestampF,timestampT))
+					if len(existingAlarmLog)>0:
+						existingAlarmLog = existingAlarmLog[0]
+					else:
+						existingAlarmLog = None
+					if existingAlarmLog!=None:
+						existingLogs = existingAlarmLog.logs.all()
+						for log in logs:
+							if log.machine.id == celement[0] and log not in existingLogs:
+								existingAlarmLog.logs.add(log)
+								changed = True
+					else:
+					#kraj dodatnih provera
+						alarmlog = AlarmLog.objects.create(alarm=alarmRule,time=datetime.now(pytz.utc),seen=False)
 						alarmlog.save()
 						changed = True
 						for log in logs:
-							if log.machine.system == celement[0]:
+							if log.machine.id == celement[0]:
 								alarmlog.logs.add(log)
-			else:
+		else:
+			if alarmRule.sysspec:#os specific
+				for log in logs:
+					counter[log.machine.system] += 1#mozda moze samo log.machine ali tesko
+				for celement in counter.items():
+					if celement[1]>=alarmRule.repeat:
+						#dodati dodatne provere
+						existingAlarmLog = AlarmLog.objects.filter(alarm__id=alarmRule.id,time__range=(timestampF,timestampT))
+						if len(existingAlarmLog)>0:
+							existingAlarmLog = existingAlarmLog[0]
+						else:
+							existingAlarmLog = None
+						if existingAlarmLog!=None:
+							existingLogs = existingAlarmLog.logs.all()
+							for log in logs:
+								if log.machine.system == celement[0] and log not in existingLogs:
+									existingAlarmLog.logs.add(log)
+									changed = True
+						else:
+						#kraj dodatnih provera
+							alarmlog = AlarmLog.objects.create(alarm=alarmRule,time=datetime.now(pytz.utc),seen=False)
+							alarmlog.save()
+							changed = True
+							for log in logs:
+								if log.machine.system == celement[0]:
+									alarmlog.logs.add(log)
+			else:#its not specific at all
 				if logs.count()>=alarmRule.repeat:
-					alarmlog = AlarmLog.objects.create(alarm=alarmRule,time=datetime.now(),seen=False)
-					alarmlog.save()
-					changed = True
-					for log in logs:
-						if log.machine.system == celement[0]:
+					#dodati dodatne provere
+					existingAlarmLog = AlarmLog.objects.filter(alarm__id=alarmRule.id,time__range=(timestampF,timestampT))
+					if len(existingAlarmLog)>0:
+						existingAlarmLog = existingAlarmLog[0]
+					else:
+						existingAlarmLog = None
+					if existingAlarmLog!=None:
+						existingLogs = existingAlarmLog.logs.all()
+						for log in logs:
+							if log not in existingLogs:
+								existingAlarmLog.logs.add(log)
+								changed = True
+					else:
+					#kraj dodatnih provera
+						alarmlog = AlarmLog.objects.create(alarm=alarmRule,time=datetime.now(pytz.utc),seen=False)
+						alarmlog.save()
+						changed = True
+						for log in logs:
 							alarmlog.logs.add(log)
 	if changed:
 		t1 = threading.Thread(target=notifyChange)
 		t1.start()
+	print(changed)
 	
 def alarmCheckRunner():
 	t1 = threading.Thread(target=alarmCheckBeat)
