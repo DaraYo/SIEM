@@ -221,7 +221,7 @@ def alarmCheck():
 			for celement in counter.items():
 				if celement[1]>=alarmRule.repeat:
 					#dodati dodatne provere
-					existingAlarmLog = AlarmLog.objects.filter(alarm__id=alarmRule.id,time__range=(timestampF,timestampT))
+					existingAlarmLog = AlarmLog.objects.filter(alarm__id=alarmRule.id,time__range=(timestampF,timestampT),seen=False)
 					if len(existingAlarmLog)>0:
 						existingAlarmLog = existingAlarmLog[0]
 					else:
@@ -247,7 +247,7 @@ def alarmCheck():
 				for celement in counter.items():
 					if celement[1]>=alarmRule.repeat:
 						#dodati dodatne provere
-						existingAlarmLog = AlarmLog.objects.filter(alarm__id=alarmRule.id,time__range=(timestampF,timestampT))
+						existingAlarmLog = AlarmLog.objects.filter(alarm__id=alarmRule.id,time__range=(timestampF,timestampT),seen=False)
 						if len(existingAlarmLog)>0:
 							existingAlarmLog = existingAlarmLog[0]
 						else:
@@ -269,7 +269,7 @@ def alarmCheck():
 			else:#its not specific at all
 				if logs.count()>=alarmRule.repeat:
 					#dodati dodatne provere
-					existingAlarmLog = AlarmLog.objects.filter(alarm__id=alarmRule.id,time__range=(timestampF,timestampT))
+					existingAlarmLog = AlarmLog.objects.filter(alarm__id=alarmRule.id,time__range=(timestampF,timestampT),seen=False)
 					if len(existingAlarmLog)>0:
 						existingAlarmLog = existingAlarmLog[0]
 					else:
