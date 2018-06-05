@@ -5,6 +5,15 @@
       <title>Alarm Logs</title>
       <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" />
       <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
+      <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+      <script>
+          $(document).ready(function ()
+		{
+          document.getElementById("type").value = document.getElementById("typehidden").value;
+          document.getElementById("type").selected=true;
+        }
+          );
+      </script>
       <style>
          /* Set height of the grid so .sidenav can be 100% (adjust if needed) */
          .row.content {height: 1500px}
@@ -67,10 +76,11 @@
                   <input class="form-control" name='regmsgid' value={{ alarm.regmsgid}} style="width:100%;"/>
                   Text
                   <br>
-                  <input class="form-control" name='text' value={{ alarm.text}} style="width:100%;"/>
+                  <input class="form-control" name='text' value= {{ alarm.text }} style="width:100%;"/>
                   Type
                   <br>
-                  <select class="form-control" name="type" select={{ alarm.type }} style="width:100%;">
+                  <input type="hidden" id="typehidden" value= {{ alarm.type }} />
+                  <select class="form-control" id="type" name="type"  style="width:100%;">
                      <option value="Emergency">Emergency</option>
                      <option value="Alert">Alert</option>
                      <option value="Critical">Critical</option>
@@ -98,7 +108,7 @@
 				     <input type="checkbox"  name="macspec"/>
 				  {% endif %}
 				  <br>
-                  Hours
+                  Minutes
                   <br>
                   <input class="form-control" value="{{ alarm.minutes }}" name='hours' id='hours' pattern="[0-9.]+" style="width:100%;"/>
 				  <br>

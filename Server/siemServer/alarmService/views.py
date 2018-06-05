@@ -68,7 +68,10 @@ def generateAlarm(request):
 		a.regmsgid = request.POST.get('regmsgid')
 		a.text = request.POST.get('text')
 		a.type = request.POST.get('type')
-		a.repeat = request.POST.get('repeat')
+		if(request.POST.get('repeat')==''):
+			a.repeat=1
+		else:
+			a.repeat = request.POST.get('repeat')
 		if(request.POST.get('sysspec')=='on'):
 			a.sysspec = True
 		else:
@@ -161,7 +164,10 @@ def submitAlarmEdit(request):
 		a.regmsgid = request.POST.get('regmsgid')
 		a.text = request.POST.get('text')
 		a.type = request.POST.get('type')
-		a.repeat = request.POST.get('repeat')
+		if(request.POST.get('repeat')==''):
+			a.repeat=1
+		else:
+			a.repeat = request.POST.get('repeat')
 		if(request.POST.get('sysspec')=='on'):
 			a.sysspec = True
 		else:

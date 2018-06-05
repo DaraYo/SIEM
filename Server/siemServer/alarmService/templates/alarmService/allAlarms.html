@@ -113,10 +113,10 @@
                   <input id="to" type="hidden" value="{{toalarm}}" name="to"/>
 				  Date from:
                   <br>
-                  <input class="form-control" type="text" name="timestampfrom" style="width:100%;"/>
+                  <input class="form-control" type="date" name="timestampfrom" style="width:100%;"/>
                   Date to:
                   <br>
-                  <input class="form-control" type="text" name="timestampto" style="width:100%;"/>
+                  <input class="form-control" type="date" name="timestampto" style="width:100%;"/>
                   <input class="btn btn-primary active" id="submit" type="submit" class="btn" value="Search" name="submit" style="width:100%;">
                </form>
             </div>
@@ -131,9 +131,9 @@
                   </tr>
                   {% for alarm in alarms %}
                   <tr>
-                     <td>{{ alarm.alarm }}</td>
+                     <td>{{ alarm.alarm.text }}</td>
                      <td>{{ alarm.time }}</td>
-                     <td>{{ alarm.machine }}</td>
+                     <td>{{ alarm.machine.ip }}</td>
                      <td>{{ alarm.seen }}</td>
 					 <td>
 						 <form action="getAlarm" method="get">
