@@ -290,7 +290,7 @@ def alarmCheck():
 	if changed:
 		t1 = threading.Thread(target=notifyChange)
 		t1.start()
-	print(changed)
+	#print(changed)
 	
 def alarmCheckRunner():
 	t1 = threading.Thread(target=alarmCheckBeat)

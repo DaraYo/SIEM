@@ -81,7 +81,7 @@ def start():
     t1.start()
     #run other threads
     alarmCheckRunner()
-    #reportGeneratorRunner()
+    reportGeneratorRunner()
 
 def webSocketThread():
     asyncio.set_event_loop(asyncio.new_event_loop())

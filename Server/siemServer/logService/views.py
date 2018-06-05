@@ -12,6 +12,7 @@ import json
 from django.db.models import Sum
 from .models import Log,Machine
 from alarmService.models import Report, AlarmLog
+from logService.models import PredefinedReport
 from siemServer.settings import GENERATING_REPORT_TIME
 
 # Create your views here.
@@ -110,12 +111,16 @@ def report(request):
 	try:
 		if request.GET:
 			print('aaaaaaaa')
-			selectedMachines = request.GET.get('cb1') or ""
-			selectedApps = request.GET.get('cb2') or ""
+			selectedMac= request.GET.getlist('cb1') or ""
+			selectedA= request.GET.getlist('cb2') or ""
 			timestampF = request.GET.get('timestampfrom') or "None"
 			timestampT = request.GET.get('timestampto') or "None"
 			nForMach = 0
 			tForApps = 0
+			allParams=[]
+			allParams.append(selectedMac)
+			allParams.append(selectedA)
+			allParams.append([timestampF+" - "+timestampT])
 			if (timestampF != 'None'):
 				timestampF = datetime.strptime(timestampF, '%Y-%m-%dT%H:%M:%S.%f%z')
 			else:
@@ -126,13 +131,31 @@ def report(request):
 				timestampT = datetime.now()
 
 			logs = Log.objects.filter(timestamp__range=(timestampF, timestampT))
-			for m in selectedMachines:
-				nForMach += len(logs.filter(machine__ip=m))
-			for t in selectedApps:
-				tForApps += len(logs.filter(appname=t))
-		#reports=[]
+			for m in selectedMac:
+				for t in selectedA:
+					print(t)
+					print(m)
+					if logs.filter(machine__ip=m, appname=t) != "None":
+						nForMach += len(logs.filter(machine__ip=m, appname=t))
+			print("juhuuu")
+			print(nForMach)
+			alarms = AlarmLog.objects.filter(time__range=(timestampF, timestampT))
+			numbOfAlarms = len(alarms)
+			emAlarms = len(alarms.filter(alarm__type='0'))
+			alAlarms = len(alarms.filter(alarm__type='1'))
+			crtAlarms = len(alarms.filter(alarm__type='2'))
+			errAlarms = len(alarms.filter(alarm__type='3'))
+			warAlarms = len(alarms.filter(alarm__type='4'))
+			ntcAlarms = len(alarms.filter(alarm__type='5'))
+			predefined= PredefinedReport.objects.create(time= datetime.now(), generatedFor=allParams,
+														numbOfAllLogs= nForMach, numbOfAllAlarms= numbOfAlarms,
+														nOfEmergAlarms= emAlarms, nOfAlertAlarms= alAlarms,
+														nOfCritAlarms= crtAlarms, nOfErrAlarms= errAlarms,
+														nOfWarnAlarms= warAlarms, nOfNotcAlarms= ntcAlarms)
+			predefined.save()
+
 		machines= Machine.objects.all()
-		apps= Log.objects.order_by().values_list('appname').distinct()
+		apps= Log.objects.order_by().values('appname').distinct()
 		reports= Report.objects.all()
 		total=reports.aggregate(Sum('numbOfAllLogs'), Sum('numbOfAllAlarms'), Sum('numbOfWinLogs'), Sum('numbOfLinLogs'), Sum('numbOfWinAlarms'), Sum('numbOfLinAlarms'))
 	except ValueError:
@@ -141,38 +164,32 @@ def report(request):
 
 @login_required(login_url="/accounts/login")
 #@permission_required('logService.get_report')
-def predefineReport(request):
+def predefineReports(request):
 	try:
-		selectedMachines= request.GET.get('cb1') or ""
-		selectedApps = request.GET.get('cb2') or ""
-		timestampF = request.GET.get('timestampfrom') or "None"
-		timestampT = request.GET.get('timestampto') or "None"
-		nForMach=0
-		tForApps= 0
-		for m in selectedMachines:
-			nForMach+=len(Log.objects.filter(machine__ip= m))
-		#machineValues= sum(nForMach.values())
-		for t in selectedApps:
-			tForApps+=len(Log.objects.filter(appname= t))
-		#appsValues = sum(tForApps.values())
+		predefined= PredefinedReport.objects.all()
 	except ValueError:
 		print("ERROR")
-	return render(request, 'logService/report.html')
+	return render(request, 'logService/predefined.html', {'predefined': predefined})
 
 def reportGenerate():
-	print("hehe")
+	print("Sss")
+	time= datetime.now()
+	try:
+		lastR= [Report.objects.order_by('-id')[0]]
+	except:
+		lastR= None
+	print(lastR)
+	print("Sss")
 	logs = Log.objects.all()
 	alarms = AlarmLog.objects.all()
-	#reports= Report.objects.all()
-	winLogs= len(logs.filter(machine__system= 'Windows'))
-	lnxLogs = len(logs.filter(machine__system = 'Linux'))
-	winAlarms = len(alarms.filter(logs__machine_system = 'Windows'))
-	lnxAlarms = len(alarms.filter(logs__machine_system = 'Linux'))
-	report = Report.objects.create(timestamp=datetime.now(), numbOfAllLogs=logs, numbOfAllAlarms=alarms,
-									numbOfWinLogs=winLogs,numbOfLinLogs=lnxLogs,
-									numbOfWinAlarms=winAlarms, numbOfLinAlarms=lnxAlarms)
+	print(len(alarms.filter(logs__machine__system = 'W')))
+	winLogs= len(logs.filter(machine__system= 'W'))
+	lnxLogs = len(logs.filter(machine__system = 'L'))
+	winAlarms = len(alarms.filter(logs__machine__system = 'W'))
+	lnxAlarms = len(alarms.filter(logs__machine__system = 'L'))
+	report = Report.objects.create(timestamp=datetime.now(), numbOfAllLogs=len(logs), numbOfAllAlarms=len(alarms), numbOfWinLogs=winLogs,
+								numbOfLinLogs=lnxLogs, numbOfWinAlarms=winAlarms, numbOfLinAlarms=lnxAlarms)
 	report.save()
-	print("hehe")
 
 def reportGeneratorRunner():
 	t1 = threading.Thread(target=reportGeneratorBeat)
@@ -181,6 +198,7 @@ def reportGeneratorRunner():
 def reportGeneratorBeat():
 	while(reportGenerating):
 		reportGenerate()
+		GENERATING_REPORT_TIME=43200
 		time.sleep(GENERATING_REPORT_TIME)
 
 reportGenerating = True

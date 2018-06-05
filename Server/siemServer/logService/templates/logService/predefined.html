@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Report</title>
+    <title>Predefined</title>
 	<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
 	<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
@@ -92,7 +92,6 @@
 				$("p").hide();
 				 $(":submit").attr("disabled", true);
 				 $("p").show();
-				 $("showlast").show();
 			});
 
 			$(document).ready(function(){
@@ -100,8 +99,6 @@
     			if (!$checkbox.length){
     				$(":submit").attr("disabled", true);
     			}
-
-
 			});
 
 
@@ -163,12 +160,7 @@
     <div style="background-color: #555;
          color: white;
          padding: 15px;">
-		<h2 style="display: inline"><a href="getLogs" style="text-decoration: none"> Logs</a></h2>
-		<h2 style="display: inline"> <a href="allAlarms" style="text-decoration: none">Alarms</a></h2>
-		{% if perms.alarmService.get_alarm_rules %}
-		<h2 style="display: inline"><a href="alarmRules">Alarm Rules</a></h2>
-		{% endif %}
-		<h1 style="display: inline">Report</h1>
+		<h2 style="display: inline"><a href="report" style="text-decoration: none">Back to reports</a></h2>
         <a href="/accounts/logout" class="btn btn-primary" role="button" style="float: right;">Logout</a>
 	</div>
 	<div class="container-fluid">
@@ -219,57 +211,52 @@
                   Date to:
                   <br>
                   <input class="form-control" type="text" name="timestampto" style="width:100%;"/>
-
                   <input class="btn btn-primary active" id="submit" type="submit" class="btn" value="Generate" name="submit" style="width:100%;">
 				   <p hidden>Wait few seconds</p>
                </form>
-				 <input class="btn btn-primary active" id="showlast" type="submit" class="btn" value="Show report" name="showlast" style="width:100%;" hidden>
-			   <a href="/api/predefined" class="btn" role="button" style="width:100%;">Show all predefined reports</a>
 			   </div>
 			<div class="col-sm-9">
 				<table align="center" class="table table-striped" style="table-layout:fixed" id="myTable">
 					<tr align="center" class="thead-dark">
-						<th rowspan="2" onclick="sortTable(0)">Date</th>
-						<th colspan="6">Number of</th>
+						<th colspan="9">Number of</th>
 					</tr>
 					<tr align="center" class="thead-dark">
-						<th onclick="sortTable(1)">All logs</th>
-						<th onclick="sortTable(2)">All alarms</th>
+                        <th onclick="sortTable(0)">Info</th>
+						<th onclick="sortTable(1)">Logs</th>
+						<th onclick="sortTable(2)">Alarms</th>
 						<th onclick="sortTable(3)">
-							Windows logs
+							Emergency alarms
 						</th>
 						<th onclick="sortTable(4)">
-							Linux logs
+							Alert alarms
 						</th>
 						<th onclick="sortTable(5)">
-							Windows alarms
+							Critical alarms
 						</th>
 						<th onclick="sortTable(6)">
-							Linux alarms
+							Error alarms
+						</th>
+                        <th onclick="sortTable(7)">
+							Warning alarms
+						</th>
+                        <th onclick="sortTable(8)">
+							Notice alarms
 						</th>
 					</tr>
-					{% for report in reports %}
+					{% for predefined in preports %}
 					<tr align="center">
-						<td>{{ report.timestamp }}</td>
-						<td>{{ report.numbOfAllLogs }}</td>
-						<td>{{ report.numbOfAllAlarms }}</td>
-						<td>{{ report.numbOfWinLogs }}</td>
-						<td>{{ report.numbOfLinLogs }}</td>
-						<td>{{ report.numbOfWinAlarms }}</td>
-						<td>{{ report.numbOfLinAlarms }}</td>
+						<td>{{ predefined.time }}</td>
+                        <td>{{ predefined.generatedFor }}</td>
+                        <td>{{ predefined.numbOfAllLogs }}</td>
+                        <td>{{ predefined.numbOfAllAlarms }}</td>
+						<td>{{ predefined.nOfEmergAlarms }}</td>
+						<td>{{ predefined.nOfAlertAlarms }}</td>
+						<td>{{ predefined.nOfCritAlarms }}</td>
+						<td>{{ predefined.nOfErrAlarms }}</td>
+						<td>{{ predefined.nOfWarnAlarms }}</td>
+						<td>{{ predefined.nOfNotcAlarms }}</td>
 					</tr>
 					{% endfor %}
-				</table>
-				<table class="table table-striped" style="table-layout:fixed">
-					<tr align="center" class="thead-dark">
-						<td>Total</td>
-						<td>{{ total.numbOfAllLogs__sum }}</td>
-						<td>{{ total.numbOfAllAlarms__sum }}</td>
-						<td>{{ total.numbOfWinLogs__sum }}</td>
-						<td>{{ total.numbOfLinLogs__sum }}</td>
-						<td>{{ total.numbOfWinAlarms__sum }}</td>
-						<td>{{ total.numbOfLinAlarms__sum }}</td>
-					</tr>
 				</table>
 			</div>
 		 </div>

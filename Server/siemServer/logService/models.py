@@ -37,3 +37,14 @@ class Log(models.Model):
             models.Index(fields=['-timestamp'], name='timestamp_idx'),
         ]
 
+class PredefinedReport(models.Model):
+	time = models.DateTimeField(null=False)
+	generatedFor= models.CharField(max_length=1000)
+	numbOfAllLogs = models.BigIntegerField(default=0)
+	numbOfAllAlarms = models.BigIntegerField(default=0)
+	nOfEmergAlarms = models.BigIntegerField(default=0)
+	nOfAlertAlarms = models.BigIntegerField(default=0)
+	nOfCritAlarms = models.BigIntegerField(default=0)
+	nOfErrAlarms = models.BigIntegerField(default=0)
+	nOfWarnAlarms = models.BigIntegerField(default=0)
+	nOfNotcAlarms = models.BigIntegerField(default=0)

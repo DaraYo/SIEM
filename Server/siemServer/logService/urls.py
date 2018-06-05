@@ -7,5 +7,5 @@ urlpatterns = [
     path('log', views.log),
     url(r'^getLogs', views.getLogs),
     path('report', views.report),
-	path('predefineReport', views.predefineReport)
+	path('predefined', views.predefineReports)
 ]
