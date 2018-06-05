@@ -98,7 +98,7 @@
 			$(document).ready(function(){
 				var $checkbox = $(this).find('.checkbox');
     			if (!$checkbox.length){
-    				$(":submit").attr("disabled", true);
+                    $(":submit").attr("disabled", true);
     			}
 
 
@@ -165,6 +165,7 @@
          padding: 15px;">
 		<h2 style="display: inline"><a href="getLogs" style="text-decoration: none"> Logs</a></h2>
 		<h2 style="display: inline"> <a href="allAlarms" style="text-decoration: none">Alarms</a></h2>
+        <h1 style="display: inline"><a href="alarmMonitoring" style="text-decoration:none">   Alarm Monitoring   </a></h1>
 		{% if perms.alarmService.get_alarm_rules %}
 		<h2 style="display: inline"><a href="alarmRules">Alarm Rules</a></h2>
 		{% endif %}
@@ -208,10 +209,10 @@
 					 </div>
 			 		<br>
 				   Windows OS
-                  <input type="checkbox" class="example" name="win"/>
+                  <input type="checkbox" class="example" name="win" value="win"/>
 					<br>
                   Linux OS
-                  <input type="checkbox" class="example" name="lin"/>
+                  <input type="checkbox" class="example" name="lin" value="lin"/>
 				  <br>
                   Date from:
                   <br>

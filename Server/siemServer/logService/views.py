@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import permission_required,login_required
 from datetime import datetime, timedelta
 import re
 import time
+from time import sleep,strftime,localtime, gmtime
 import math
 import threading
 import json
@@ -108,6 +109,7 @@ def getLogs(request):
 #@permission_required('logService.get_report')
 def report(request):
 	date= datetime.now()
+	allParams = []
 	try:
 		if request.GET:
 			print('aaaaaaaa')
@@ -117,7 +119,6 @@ def report(request):
 			timestampT = request.GET.get('timestampto') or "None"
 			nForMach = 0
 			tForApps = 0
-			allParams=[]
 			allParams.append(selectedMac)
 			allParams.append(selectedA)
 			allParams.append([timestampF+" - "+timestampT])
@@ -131,13 +132,16 @@ def report(request):
 				timestampT = datetime.now()
 
 			logs = Log.objects.filter(timestamp__range=(timestampF, timestampT))
+			winCB= request.GET.get('win') or ""
+			linCB = request.GET.get('lin') or ""
+			if winCB!="" and linCB=="":
+				logs= logs.filter(machine__system='W')
+			if winCB=="" and linCB!="":
+				logs= logs.filter(machine__system='L')
 			for m in selectedMac:
 				for t in selectedA:
-					print(t)
-					print(m)
 					if logs.filter(machine__ip=m, appname=t) != "None":
 						nForMach += len(logs.filter(machine__ip=m, appname=t))
-			print("juhuuu")
 			print(nForMach)
 			alarms = AlarmLog.objects.filter(time__range=(timestampF, timestampT))
 			numbOfAlarms = len(alarms)
@@ -160,26 +164,45 @@ def report(request):
 		total=reports.aggregate(Sum('numbOfAllLogs'), Sum('numbOfAllAlarms'), Sum('numbOfWinLogs'), Sum('numbOfLinLogs'), Sum('numbOfWinAlarms'), Sum('numbOfLinAlarms'))
 	except ValueError:
 		print("ERROR")
-	return render(request, 'logService/report.html', {'reports': reports, 'machines': machines, 'apps': apps, 'total': total})
+	return render(request, 'logService/report.html', {'reports': reports, 'machines': machines, 'apps': apps, 'total': total, 'allParams': allParams})
 
 @login_required(login_url="/accounts/login")
 #@permission_required('logService.get_report')
 def predefineReports(request):
 	try:
 		predefined= PredefinedReport.objects.all()
+		print(len(predefined))
 	except ValueError:
 		print("ERROR")
-	return render(request, 'logService/predefined.html', {'predefined': predefined})
+	return render(request, 'logService/predefined.html', {'preports': predefined})
 
 def reportGenerate():
-	print("Sss")
-	time= datetime.now()
+	timet= datetime.now()
+	neededTime = time.localtime()
+	print("ovo je trenutno vreme")
+	neededTime = strftime('%Y-%m-%dT%H:%M:%S.00%z', neededTime)
+	neededTime = datetime.strptime(neededTime, '%Y-%m-%dT%H:%M:%S.%f%z')
 	try:
-		lastR= [Report.objects.order_by('-id')[0]]
+		lst= Report.objects.last()
+		#print(timet)
+		print(neededTime)
+		print("ovo je vreme poslednjeg loga i poslednjeg +12h")
+		plus= lst.timestamp+ timedelta(hours=12)
+		print(lst.timestamp)
+		print(plus)
+		if(lst.timestamp+ timedelta(hours=12)> neededTime):
+			timed=plus- neededTime
+			print("razlika izmedju +12 i trenutnog vremena")
+			print(timed)
+			seconds= timed.total_seconds()
+			print(seconds)
+			print("trenutno -12")
+			print(neededTime-timedelta(hours=12))
+			print(neededTime+timedelta(hours=12)- lst.timestamp + timedelta(hours=12))
+			time.sleep(seconds)
 	except:
-		lastR= None
-	print(lastR)
-	print("Sss")
+		print("u exceptu je")
+		lst= None
 	logs = Log.objects.all()
 	alarms = AlarmLog.objects.all()
 	print(len(alarms.filter(logs__machine__system = 'W')))
@@ -187,6 +210,8 @@ def reportGenerate():
 	lnxLogs = len(logs.filter(machine__system = 'L'))
 	winAlarms = len(alarms.filter(logs__machine__system = 'W'))
 	lnxAlarms = len(alarms.filter(logs__machine__system = 'L'))
+	time.sleep(10)
+	print("heeeyhooo")
 	report = Report.objects.create(timestamp=datetime.now(), numbOfAllLogs=len(logs), numbOfAllAlarms=len(alarms), numbOfWinLogs=winLogs,
 								numbOfLinLogs=lnxLogs, numbOfWinAlarms=winAlarms, numbOfLinAlarms=lnxAlarms)
 	report.save()

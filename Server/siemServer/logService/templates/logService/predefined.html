@@ -218,35 +218,40 @@
 			<div class="col-sm-9">
 				<table align="center" class="table table-striped" style="table-layout:fixed" id="myTable">
 					<tr align="center" class="thead-dark">
+						<th rowspan="2" onclick="sortTable(0)">Date</th>
 						<th colspan="9">Number of</th>
 					</tr>
 					<tr align="center" class="thead-dark">
-                        <th onclick="sortTable(0)">Info</th>
-						<th onclick="sortTable(1)">Logs</th>
-						<th onclick="sortTable(2)">Alarms</th>
-						<th onclick="sortTable(3)">
+                        <th onclick="sortTable(1)">Info</th>
+						<th onclick="sortTable(2)">Logs</th>
+						<th onclick="sortTable(3)">Alarms</th>
+						<th onclick="sortTable(4)">
 							Emergency alarms
 						</th>
-						<th onclick="sortTable(4)">
+						<th onclick="sortTable(5)">
 							Alert alarms
 						</th>
-						<th onclick="sortTable(5)">
+						<th onclick="sortTable(6)">
 							Critical alarms
 						</th>
-						<th onclick="sortTable(6)">
+						<th onclick="sortTable(7)">
 							Error alarms
 						</th>
-                        <th onclick="sortTable(7)">
+                        <th onclick="sortTable(8)">
 							Warning alarms
 						</th>
-                        <th onclick="sortTable(8)">
+                        <th onclick="sortTable(9)">
 							Notice alarms
 						</th>
 					</tr>
 					{% for predefined in preports %}
 					<tr align="center">
 						<td>{{ predefined.time }}</td>
-                        <td>{{ predefined.generatedFor }}</td>
+                        <td>
+                            {% for par in allParams %}
+                            {{ par }}<br>
+                            {% endfor %}
+                        </td>
                         <td>{{ predefined.numbOfAllLogs }}</td>
                         <td>{{ predefined.numbOfAllAlarms }}</td>
 						<td>{{ predefined.nOfEmergAlarms }}</td>
