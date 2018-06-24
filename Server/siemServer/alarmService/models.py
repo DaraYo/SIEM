@@ -29,6 +29,8 @@ class Alarm(models.Model):
 	type= models.CharField(max_length=1,choices = Type_CHOICES)
 	sysspec = models.BooleanField()
 	machinespec = models.BooleanField()
+	appspec = models.BooleanField()
+	rmispec = models.BooleanField()
 	minutes = models.SmallIntegerField()
 	active = models.BooleanField()
 
