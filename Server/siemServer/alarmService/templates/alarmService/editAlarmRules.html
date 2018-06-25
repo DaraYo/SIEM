@@ -61,22 +61,22 @@
                <form method = post action = "./submitAlarmEdit">
                   Facility regex
                   <br>
-                  <input class="form-control" name='regfacility' value={{ alarm.regfacility}} style="width:100%;"/>
+                  <input class="form-control" name='regfacility' value= "{{ alarm.regfacility }}" style="width:100%;"/>
                   Severity regex
                   <br>
-                  <input class="form-control" name='regseverity' value={{ alarm.regseverity}} style="width:100%;"/>
+                  <input class="form-control" name='regseverity' value= "{{ alarm.regseverity }}" style="width:100%;"/>
                   Host name regex
                   <br>
-                  <input class="form-control" name='reghostname' value={{ alarm.reghostname}} style="width:100%;"/>
+                  <input class="form-control" name='reghostname' value= "{{ alarm.reghostname }}" style="width:100%;"/>
                   Application name regex
                   <br>
-                  <input class="form-control" name='regappname' value={{ alarm.regappname}} style="width:100%;"/>
+                  <input class="form-control" name='regappname' value= "{{ alarm.regappname }}" style="width:100%;"/>
                   Message ID regex
                   <br>
-                  <input class="form-control" name='regmsgid' value={{ alarm.regmsgid}} style="width:100%;"/>
+                  <input class="form-control" name='regmsgid' value= "{{ alarm.regmsgid }}" style="width:100%;"/>
                   Text
                   <br>
-                  <input class="form-control" name='text' value= {{ alarm.text }} style="width:100%;"/>
+                  <input class="form-control" name='text' value= "{{ alarm.text }}" style="width:100%;"/>
                   Type
                   <br>
                   <input type="hidden" id="typehidden" value= {{ alarm.type }} />
