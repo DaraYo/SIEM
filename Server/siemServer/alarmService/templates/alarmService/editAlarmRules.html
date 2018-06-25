@@ -44,7 +44,7 @@
       padding: 15px;">
          <h2 style="display: inline"><a style="text-decoration: none" href="getLogs">   Logs   </a></h2>
          <h2 style="display: inline"><a style="text-decoration: none" href="allAlarms">   Alarms   </a></h2>
-		 <a href="alarmMonitoring" style="text-decoration:none">   Alarm Monitoring   </a>
+		     <h2 style="display: inline"><a href="alarmMonitoring" style="text-decoration:none">   Alarm Monitoring   </a></h2>
          {% if perms.alarmService.get_alarm_rules %}
          <h2 style="display: inline"><a style="text-decoration: none" href="alarmRules">   Alarm Rules   </a></h2>
          {% endif %}
@@ -100,12 +100,30 @@
 				     <input type="checkbox"  name="sysspec"/>
 				  {% endif %}
 				  <br>
-                  Machine specified
+          Machine specified
 				  {% if alarm.machinespec == True %}
 					 <input type="checkbox"  name="macspec" checked/>
 				  {% endif %}
 				  {% if alarm.machinespec == False %}
 				     <input type="checkbox"  name="macspec"/>
+				  {% endif %}
+          <br>
+          
+          Application specific
+				  {% if alarm.appspec == True %}
+					 <input type="checkbox"  name="appspec" checked/>
+				  {% endif %}
+				  {% if alarm.appspec == False %}
+				     <input type="checkbox"  name="appspec"/>
+				  {% endif %}
+          <br>
+          
+          Unique message ID specific
+				  {% if alarm.rmispec == True %}
+					 <input type="checkbox"  name="rmispec" checked/>
+				  {% endif %}
+				  {% if alarm.rmispec == False %}
+				     <input type="checkbox"  name="rmispec"/>
 				  {% endif %}
 				  <br>
                   Minutes

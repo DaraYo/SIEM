@@ -35,7 +35,7 @@
       padding: 15px;">
          <h2 style="display: inline"><a style="text-decoration: none" href="getLogs">   Logs   </a></h2>
          <h2 style="display: inline"><a style="text-decoration: none" href="allAlarms">   Alarms   </a></h2>
-		 <a href="alarmMonitoring" style="text-decoration:none">   Alarm Monitoring   </a>
+		 <h2 style="display: inline"><a href="alarmMonitoring" style="text-decoration:none">   Alarm Monitoring   </a></h2>
          {% if perms.alarmService.get_alarm_rules %}
          <h1 style="display: inline">   Alarm Rules   </h1>
          {% endif %}
@@ -83,6 +83,12 @@
 				  <br>
                   Machine specified
                   <input type="checkbox" name="macspec"/>
+                  <br>
+                  Application specific
+                  <input type="checkbox" name="appspec"/>
+                  <br>
+                  Unique meesage ID specified
+                  <input type="checkbox" name="rmispec"/>
 				  <br>
                   Minutes
                   <br>
@@ -103,6 +109,8 @@
                      <th>Repeat</th>
                      <th>System specified</th>
                      <th>Machine specified</th>
+                     <th>Application specific</th>
+                     <th>Unique message ID specific</th>
                      <th>Minutes</th>
                      <th>Active</th>
 					 <th>Edit</th>
@@ -119,6 +127,8 @@
                      <td>{{ alarm.repeat }}</td>
                      <td>{{ alarm.sysspec }}</td>
                      <td>{{ alarm.machinespec }}</td>
+                     <td>{{ alarm.appspec }}</td>
+                     <td>{{ alarm.rmispec }}</td>
                      <td>{{ alarm.minutes }}</td>
                      <td>{{ alarm.active }}</td>
 					 <td>
