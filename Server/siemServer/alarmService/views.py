@@ -223,22 +223,28 @@ def getAlarmingLogs():
 		
 #NEW ALARMING#
 def repAlarm(alarmRule, logs, timestampF, timestampT, type, *rest):
+	#print('-------->REP ALARM HERE')
 	counter = Counter()
 	changed = False
 	if type=='us':
+		#print('--------->counting system')
 		for log in logs:
 			counter[log.machine.system] += 1
 	elif type=='um':
+		#print('--------->counting machine')
 		for log in logs:
 			counter[log.machine.id] += 1
 	elif type=='ua':
+		#print('--------->counting appname')
 		for log in logs:
 			counter[log.appname] += 1
 	else:#'ui'
+		#print('--------->counting msgid')
 		for log in logs:
 			counter[log.msgid] += 1
 	
 	for celement in counter.items():
+		#print('---------->element:'+str(celement[0])+' repeats:'+str(celement[1]))
 		if celement[1]>=alarmRule.repeat:
 			#get alarmlog if it exists
 			existingAlarmLog = AlarmLog.objects.filter(alarm__id=alarmRule.id,time__range=(timestampF,timestampT),seen=False)
@@ -246,10 +252,11 @@ def repAlarm(alarmRule, logs, timestampF, timestampT, type, *rest):
 				existingAlarmLog = existingAlarmLog[0]
 			else:
 				existingAlarmLog = None
-
+			#print('----------->unique checks left:'+str(len(list(rest))))
 			if len(list(rest))<1:
 				#old alarm
 				if existingAlarmLog!=None:
+					#print('------------->>Updating alarm')
 					existingLogs = existingAlarmLog.logs.all()
 					if type=='us':
 						for log in logs:
@@ -271,9 +278,9 @@ def repAlarm(alarmRule, logs, timestampF, timestampT, type, *rest):
 							if log.msgid == celement[0] and log not in existingLogs:
 								existingAlarmLog.logs.add(log)
 								changed = True
-					
 				#new alarm
 				else:
+					#print('------------->>New alarm')
 					alarmlog = AlarmLog.objects.create(alarm=alarmRule,time=datetime.now(pytz.utc),seen=False)
 					alarmlog.save()
 					changed = True
@@ -294,6 +301,7 @@ def repAlarm(alarmRule, logs, timestampF, timestampT, type, *rest):
 							if log.msgid == celement[0]:
 								alarmlog.logs.add(log)
 			else:
+				#print('-------------->Preping logs for restart')
 				tmplogs = []
 				if type=='us':
 					for log in logs:
@@ -311,17 +319,19 @@ def repAlarm(alarmRule, logs, timestampF, timestampT, type, *rest):
 					for log in logs:
 						if log.msgid == celement[0]:
 							tmplogs.append(log)
+				#print("------------> Refire with logs:"+str(len(tmplogs)))
 				changed = changed or repAlarm(alarmRule,tmplogs,timestampF,timestampT,*rest)
+				#print("------------> changed after refire:"+str(changed))
+	#print("----------> Changed at the end:"+str(changed))
 	return changed
-				
-	
-#####
 
 def alarmCheck():
+	#print("++++++++++ALARM CHECK+++++++++")
 	changed = False
 	counter = Counter()
 	alarmRules = Alarm.objects.filter(active=True)
 	for alarmRule in alarmRules:
+		#print("==============> NEXT ALARM")###
 		counter.clear()
 		facility = alarmRule.regfacility
 		severity = alarmRule.regseverity
@@ -333,7 +343,7 @@ def alarmCheck():
 		#logovi se ne pribavljaju iz baze dok nisu potrebni, tako da je kod ispod koji se sastoji od vise filtriranja ekvivalentan 1 pozivanju iz baze
 		logs = Log.objects.filter(facility__iregex=facility,severity__iregex=severity,hostname__iregex=hostname, appname__iregex=appname, msgid__iregex=msgid)
 		logs = logs.filter(timestamp__range=(timestampF,timestampT))
-	########################################NEW#######################################
+		#print("====>len(LOGS):"+str(len(logs)))
 		checklist=[]
 		if alarmRule.machinespec:
 			checklist.append('um')
@@ -343,9 +353,13 @@ def alarmCheck():
 			checklist.append('ui')
 		if alarmRule.appspec:
 			checklist.append('ua')
+		#print("====> checklist size:"+str(len(checklist)))###
 		if(len(checklist)>=1):
-			changed = changed or repAlarm(alarmRule,logs,timestampF,timestampT,*checklist)
+			#print("====> calling check for size:"+str(len(checklist)))###
+			changed = repAlarm(alarmRule,logs,timestampF,timestampT,*checklist) or changed
+			#print("====> CHANGED at this point:"+str(changed))###
 		else:#no uniqe
+			#print("====> checking for no uniqes")###
 			if logs.count()>=alarmRule.repeat:
 				existingAlarmLog = AlarmLog.objects.filter(alarm__id=alarmRule.id,time__range=(timestampF,timestampT),seen=False)
 				if len(existingAlarmLog)>0:
@@ -353,99 +367,23 @@ def alarmCheck():
 				else:
 					existingAlarmLog = None
 				if existingAlarmLog!=None:
+					#print("++++> updating alarm")###
 					existingLogs = existingAlarmLog.logs.all()
 					for log in logs:
 						if log not in existingLogs:
 							existingAlarmLog.logs.add(log)
 							changed = True
 				else:
+					#print("++++> creating alarm")###
 					alarmlog = AlarmLog.objects.create(alarm=alarmRule,time=datetime.now(pytz.utc),seen=False)
 					alarmlog.save()
 					changed = True
 					for log in logs:
 						alarmlog.logs.add(log)
+			#print("====> CHANGED at this point:"+str(changed))###
 	if changed:
 		t1 = threading.Thread(target=notifyChange)
 		t1.start()
-	########################################OLD#######################################
-	'''
-		if alarmRule.machinespec:#machine specific
-			for log in logs:
-				counter[log.machine.id] += 1
-			for celement in counter.items():
-				if celement[1]>=alarmRule.repeat:
-					#dodati dodatne provere
-					existingAlarmLog = AlarmLog.objects.filter(alarm__id=alarmRule.id,time__range=(timestampF,timestampT),seen=False)
-					if len(existingAlarmLog)>0:
-						existingAlarmLog = existingAlarmLog[0]
-					else:
-						existingAlarmLog = None
-					if existingAlarmLog!=None:
-						existingLogs = existingAlarmLog.logs.all()
-						for log in logs:
-							if log.machine.id == celement[0] and log not in existingLogs:
-								existingAlarmLog.logs.add(log)
-								changed = True
-					else:
-					#kraj dodatnih provera
-						alarmlog = AlarmLog.objects.create(alarm=alarmRule,time=datetime.now(pytz.utc),seen=False)
-						alarmlog.save()
-						changed = True
-						for log in logs:
-							if log.machine.id == celement[0]:
-								alarmlog.logs.add(log)
-		else:
-			if alarmRule.sysspec:#os specific
-				for log in logs:
-					counter[log.machine.system] += 1#mozda moze samo log.machine ali tesko
-				for celement in counter.items():
-					if celement[1]>=alarmRule.repeat:
-						#dodati dodatne provere
-						existingAlarmLog = AlarmLog.objects.filter(alarm__id=alarmRule.id,time__range=(timestampF,timestampT),seen=False)
-						if len(existingAlarmLog)>0:
-							existingAlarmLog = existingAlarmLog[0]
-						else:
-							existingAlarmLog = None
-						if existingAlarmLog!=None:
-							existingLogs = existingAlarmLog.logs.all()
-							for log in logs:
-								if log.machine.system == celement[0] and log not in existingLogs:
-									existingAlarmLog.logs.add(log)
-									changed = True
-						else:
-						#kraj dodatnih provera
-							alarmlog = AlarmLog.objects.create(alarm=alarmRule,time=datetime.now(pytz.utc),seen=False)
-							alarmlog.save()
-							changed = True
-							for log in logs:
-								if log.machine.system == celement[0]:
-									alarmlog.logs.add(log)
-			else:#its not specific at all
-				if logs.count()>=alarmRule.repeat:
-					#dodati dodatne provere
-					existingAlarmLog = AlarmLog.objects.filter(alarm__id=alarmRule.id,time__range=(timestampF,timestampT),seen=False)
-					if len(existingAlarmLog)>0:
-						existingAlarmLog = existingAlarmLog[0]
-					else:
-						existingAlarmLog = None
-					if existingAlarmLog!=None:
-						existingLogs = existingAlarmLog.logs.all()
-						for log in logs:
-							if log not in existingLogs:
-								existingAlarmLog.logs.add(log)
-								changed = True
-					else:
-					#kraj dodatnih provera
-						alarmlog = AlarmLog.objects.create(alarm=alarmRule,time=datetime.now(pytz.utc),seen=False)
-						alarmlog.save()
-						changed = True
-						for log in logs:
-							alarmlog.logs.add(log)	
-	if changed:
-		t1 = threading.Thread(target=notifyChange)
-		t1.start()
-	'''
-	#print(changed)
 	
 def alarmCheckRunner():
 	t1 = threading.Thread(target=alarmCheckBeat)
