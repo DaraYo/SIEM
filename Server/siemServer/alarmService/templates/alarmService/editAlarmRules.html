@@ -56,28 +56,65 @@
             <div class="col-sm-3 sidenav">
 
             </div>
-            <div class="col-sm-9 table-responsive">
+            <div class="col-sm-9 table-responsive" style="padding-left:0;padding-right:0">
                <h4>Edit alarm rule</h4>
                <form method = post action = "./submitAlarmEdit">
-                  Facility regex
-                  <br>
-                  <input class="form-control" name='regfacility' value= "{{ alarm.regfacility }}" style="width:100%;"/>
-                  Severity regex
-                  <br>
-                  <input class="form-control" name='regseverity' value= "{{ alarm.regseverity }}" style="width:100%;"/>
-                  Host name regex
-                  <br>
-                  <input class="form-control" name='reghostname' value= "{{ alarm.reghostname }}" style="width:100%;"/>
-                  Application name regex
-                  <br>
-                  <input class="form-control" name='regappname' value= "{{ alarm.regappname }}" style="width:100%;"/>
-                  Message ID regex
-                  <br>
-                  <input class="form-control" name='regmsgid' value= "{{ alarm.regmsgid }}" style="width:100%;"/>
-                  Text
+                  About alarm:
                   <br>
                   <input class="form-control" name='text' value= "{{ alarm.text }}" style="width:100%;"/>
-                  Type
+                  Facility regex:
+                  <br>
+                  <input class="form-control" name='regfacility' value= "{{ alarm.regfacility }}" style="width:100%;"/>
+                  Severity regex:
+                  <br>
+                  <input class="form-control" name='regseverity' value= "{{ alarm.regseverity }}" style="width:100%;"/>
+                  Host name regex:
+                  <br>
+                  <input class="form-control" name='reghostname' value= "{{ alarm.reghostname }}" style="width:100%;"/>
+                  Application name regex:
+                  <br>
+                  <input class="form-control" name='regappname' value= "{{ alarm.regappname }}" style="width:100%;"/>
+                  Message ID regex:
+                  <br>
+                  <input class="form-control" name='regmsgid' value= "{{ alarm.regmsgid }}" style="width:100%;"/>
+                  System specified:
+				  
+
+                  {% if alarm.sysspec == True %}
+                    <input type="checkbox"  name="sysspec" checked/>
+                  {% endif %}
+                  {% if alarm.sysspec == False %}
+                      <input type="checkbox"  name="sysspec"/>
+                  {% endif %}
+                  <br>
+                  Machine specified:
+                  {% if alarm.machinespec == True %}
+                    <input type="checkbox"  name="macspec" checked/>
+                  {% endif %}
+                  {% if alarm.machinespec == False %}
+                      <input type="checkbox"  name="macspec"/>
+                  {% endif %}
+                  <br>
+                  
+                  Application specific:
+                  {% if alarm.appspec == True %}
+                    <input type="checkbox"  name="appspec" checked/>
+                  {% endif %}
+                  {% if alarm.appspec == False %}
+                      <input type="checkbox"  name="appspec"/>
+                  {% endif %}
+                  <br>
+                  
+                  Unique message ID specific:
+                  {% if alarm.rmispec == True %}
+                    <input type="checkbox"  name="rmispec" checked/>
+                  {% endif %}
+                  {% if alarm.rmispec == False %}
+                      <input type="checkbox"  name="rmispec"/>
+                  {% endif %}
+                  <br>
+                  
+                  Alarm type:
                   <br>
                   <input type="hidden" id="typehidden" value= {{ alarm.type }} />
                   <select class="form-control" id="type" name="type"  style="width:100%;">
@@ -88,55 +125,23 @@
                      <option value="Warning">Warning</option>
                      <option value="Notice">Notice</option>
                   </select>
-                  Repeat
+                  Number of repeats:
                   <br>
                   <input class="form-control" name='repeat' value="{{ alarm.repeat}}" pattern="[0-9.]+" style="width:100%;"/>
 				  
-                  System specified
-				  {% if alarm.sysspec == True %}
-					 <input type="checkbox"  name="sysspec" checked/>
-				  {% endif %}
-				  {% if alarm.sysspec == False %}
-				     <input type="checkbox"  name="sysspec"/>
-				  {% endif %}
-				  <br>
-          Machine specified
-				  {% if alarm.machinespec == True %}
-					 <input type="checkbox"  name="macspec" checked/>
-				  {% endif %}
-				  {% if alarm.machinespec == False %}
-				     <input type="checkbox"  name="macspec"/>
-				  {% endif %}
-          <br>
-          
-          Application specific
-				  {% if alarm.appspec == True %}
-					 <input type="checkbox"  name="appspec" checked/>
-				  {% endif %}
-				  {% if alarm.appspec == False %}
-				     <input type="checkbox"  name="appspec"/>
-				  {% endif %}
-          <br>
-          
-          Unique message ID specific
-				  {% if alarm.rmispec == True %}
-					 <input type="checkbox"  name="rmispec" checked/>
-				  {% endif %}
-				  {% if alarm.rmispec == False %}
-				     <input type="checkbox"  name="rmispec"/>
-				  {% endif %}
-				  <br>
+
                   Minutes
                   <br>
                   <input class="form-control" value="{{ alarm.minutes }}" name='hours' id='hours' pattern="[0-9.]+" style="width:100%;"/>
 				  <br>
-                  Active
+                  Activate/Deactivate Alarm
 				  {% if alarm.active == True %}
 					 <input type="checkbox"  name="active" checked/>
 				  {% endif %}
 				  {% if alarm.active == False %}
 				     <input type="checkbox"  name="active"/>
-				  {% endif %}
+          {% endif %}
+          <br>
 				  <input type="hidden" value="{{ alarm.id }}" name="id" />
                   <input class="btn btn-primary active" type="submit" value="Edit" style="width:100%;"/>
                </form>

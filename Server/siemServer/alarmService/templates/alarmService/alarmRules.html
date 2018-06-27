@@ -47,25 +47,39 @@
             <div class="col-sm-3 sidenav">
                <h4>Create alarm rule</h4>
                <form method = post action = "./generateAlarm">
-                  Facility regex
+                    About alarm:
+                    <br>
+                    <input class="form-control" name='text' style="width:100%;"/>
+
+                  Facility regex:
                   <br>
                   <input class="form-control" name='regfacility' style="width:100%;"/>
-                  Severity regex
+                  Severity regex:
                   <br>
                   <input class="form-control" name='regseverity' style="width:100%;"/>
-                  Host name regex
+                  Host name regex:
                   <br>
                   <input class="form-control" name='reghostname' style="width:100%;"/>
-                  Application name regex
+                  Application name regex:
                   <br>
                   <input class="form-control" name='regappname' style="width:100%;"/>
-                  Message ID regex
+                  Message ID regex:
                   <br>
                   <input class="form-control" name='regmsgid' style="width:100%;"/>
-                  Text
+                  System specified:
+                  <input type="checkbox" name="sysspec"/>
+				  <br>
+                  Machine specified:
+                  <input type="checkbox" name="macspec"/>
                   <br>
-                  <input class="form-control" name='text' style="width:100%;"/>
-                  Type
+                  Application specific:
+                  <input type="checkbox" name="appspec"/>
+                  <br>
+                  Unique meesage ID specified:
+                  <input type="checkbox" name="rmispec"/>
+                  <br>
+
+                  Type:
                   <br>
                   <select class="form-control" name="type" style="width:100%;">
                      <option value="Emergency">Emergency</option>
@@ -75,28 +89,17 @@
                      <option value="Warning">Warning</option>
                      <option value="Notice">Notice</option>
                   </select>
-                  Repeat
+                  Number of repeats:
                   <br>
                   <input class="form-control" name='repeat' pattern="[0-9.]+" style="width:100%;"/>
-                  System specified
-                  <input type="checkbox" name="sysspec"/>
-				  <br>
-                  Machine specified
-                  <input type="checkbox" name="macspec"/>
-                  <br>
-                  Application specific
-                  <input type="checkbox" name="appspec"/>
-                  <br>
-                  Unique meesage ID specified
-                  <input type="checkbox" name="rmispec"/>
-				  <br>
                   Minutes
                   <br>
                   <input class="form-control" name='hours' id='hours' pattern="[0-9.]+" style="width:100%;"/>
-                  <input class="btn btn-primary active" type="submit" value="Generate" style="width:100%;"/>
+                  <br>
+                  <input class="btn btn-primary active" type="submit" value="Generate Rule" style="width:100%;"/>
                </form>
             </div>
-            <div class="col-sm-9 table-responsive">
+            <div class="col-sm-9 table-responsive" style="padding-left:0;padding-right:0">
                <table class="table table-striped">
                   <tr class="thead-dark">
                      <th>Facility regex</th>
@@ -104,13 +107,13 @@
 					 <th>Hostname regex</th>
 					 <th>Appname regex</th>
 					 <th>Message id regex</th>
-                     <th>Text</th>
-                     <th>Type</th>
-                     <th>Repeat</th>
                      <th>System specified</th>
                      <th>Machine specified</th>
                      <th>Application specific</th>
                      <th>Unique message ID specific</th>
+                     <th>Type</th>
+                     <th>Repeat</th>
+                     
                      <th>Minutes</th>
                      <th>Active</th>
 					 <th>Edit</th>
@@ -122,13 +125,13 @@
 					 <td>{{ alarm.reghostname }}</td>
 					 <td>{{ alarm.regappname }}</td>
 					 <td>{{ alarm.regmsgid }}</td>
-                     <td>{{ alarm.text }}</td>
-                     <td>{{ alarm.type }}</td>
-                     <td>{{ alarm.repeat }}</td>
                      <td>{{ alarm.sysspec }}</td>
                      <td>{{ alarm.machinespec }}</td>
                      <td>{{ alarm.appspec }}</td>
                      <td>{{ alarm.rmispec }}</td>
+                     <td>{{ alarm.type }}</td>
+                     <td>{{ alarm.repeat }}</td>
+                     
                      <td>{{ alarm.minutes }}</td>
                      <td>{{ alarm.active }}</td>
 					 <td>
