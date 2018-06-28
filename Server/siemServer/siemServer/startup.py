@@ -3,6 +3,7 @@ import json
 import websockets
 import threading
 import logging
+import pathlib
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.db import IntegrityError
@@ -85,13 +86,14 @@ def start():
 
 def webSocketThread():
     asyncio.set_event_loop(asyncio.new_event_loop())
-    '''#secure version
+    #secure version
     import ssl
     ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-    ssl_context.load_cert_chain(pathlib.Path(__file__).with_name('localhost.pem'))
-
+    #ssl_context.load_cert_chain(pathlib.Path(__file__).with_name('certificate.pem'))
+    ssl_context.load_cert_chain('siemServer/certificate.pem','siemServer/privateKey.pem')
     asyncio.get_event_loop().run_until_complete(websockets.serve(alarmSocket, 'localhost', 6789, ssl=ssl_context))
     asyncio.get_event_loop().run_forever()
     '''
     asyncio.get_event_loop().run_until_complete(websockets.serve(alarmSocket, 'localhost', 6789))
     asyncio.get_event_loop().run_forever()
+    '''

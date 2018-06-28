@@ -25,7 +25,7 @@ SECRET_KEY = 'tu+frc#4-x&tzyy78$jt&al8@sk*7wb)ym5ov=v@x%%q(!iv1&'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 
@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 	'logService',
+	'sslserver',
     'alarmService'
 ]
 
@@ -126,11 +127,11 @@ LOGOUT_REDIRECT_URL = '/accounts/login'
 STATIC_URL = '/static/'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-#SECURE_PROXY_SSL_HEADER= ('HTTP_X_FORWARDED_PROTO', 'https')
-#SECURE_SSL_REDIRECT= True
-#SESSION_COOKIE_SECURE= True
-#CSRF_COOKIE_SECURE= True
-#SECURE_HSTS_INCLUDE_SUBDOMAINS= True
+SECURE_PROXY_SSL_HEADER= ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_REDIRECT= True
+SESSION_COOKIE_SECURE= True
+CSRF_COOKIE_SECURE= True
+SECURE_HSTS_INCLUDE_SUBDOMAINS= True
 
 
 #Alarm notification beat
