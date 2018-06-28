@@ -3,14 +3,24 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 from django.contrib.auth.decorators import permission_required,login_required
 
+from django.contrib.auth import authenticate, login
+
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.units import inch
+from io import BytesIO
+from reportlab.pdfgen import canvas
+
 from datetime import datetime, timedelta
 import re
-import time
+import time as tm
 from time import sleep,strftime,localtime, gmtime
 import math
 import threading
 import json
 from django.db.models import Sum
+from django.utils import timezone
+
 from .models import Log,Machine
 from alarmService.models import Report, AlarmLog
 from logService.models import PredefinedReport
@@ -110,9 +120,9 @@ def getLogs(request):
 def report(request):
 	date= datetime.now()
 	allParams = []
+	response = HttpResponse(content_type='application/pdf')
 	try:
 		if request.GET:
-			print('aaaaaaaa')
 			selectedMac= request.GET.getlist('cb1') or ""
 			selectedA= request.GET.getlist('cb2') or ""
 			timestampF = request.GET.get('timestampfrom') or "None"
@@ -156,7 +166,57 @@ def report(request):
 														nOfEmergAlarms= emAlarms, nOfAlertAlarms= alAlarms,
 														nOfCritAlarms= crtAlarms, nOfErrAlarms= errAlarms,
 														nOfWarnAlarms= warAlarms, nOfNotcAlarms= ntcAlarms)
-			predefined.save()
+			#predefined.save()
+			#response = HttpResponse(content_type='application/pdf')
+			#response['Content-Disposition'] = 'inline; filename="'+datetime.now()+'.pdf"'
+			buffer = BytesIO()
+			time= datetime.now()
+			p = canvas.Canvas("predefined/"+str(time.date())+"-"+str(time.time().hour)+"."+str(time.time().minute)+ "." + str(time.time().second)+"_predefined.pdf")
+			p.drawCentredString(80, 800, 'Izvestaj za '+str(time.date())+' '+str(time.time()))
+			p.drawString(80, 740, 'Odabrane masine:')
+			i= 740
+			if len(selectedMac)==0:
+				i-=20
+				p.drawString(300, i, '/')
+			else:
+				for n in selectedMac:
+					i-=20
+					p.drawString(120, i, str(n))
+			i-=40
+			p.drawString(80, i, 'Odabrane aplikacije:')
+			if len(selectedA) == 0:
+				i -= 20
+				p.drawString(300, i, '/')
+			else:
+				for l in selectedA:
+					i -= 20
+					p.drawString(120, i, str(l))
+
+			i-=40
+			p.drawString(80, i, 'Za operativni sistem:')
+			i -= 20
+			p.drawString(80, i, 'Za period '+ str(timestampF)+" - "+str(timestampT))
+			i-= 20
+			p.drawString(100, i, 'Ukupan broj logova: '+ str(nForMach))
+			i -= 20
+			p.drawString(100, i, 'Ukupan broj alarma: '+ str(numbOfAlarms))
+			i -= 20
+			p.drawString(100, i, 'Broj emergency alarma: '+ str(emAlarms))
+			i -= 20
+			p.drawString(100, i, 'Broj alert alarma: '+ str(alAlarms))
+			i -= 20
+			p.drawString(100, i, 'Broj critical alarma: '+ str(crtAlarms))
+			i -= 20
+			p.drawString(100, i, 'Broj error alarma: '+ str(errAlarms))
+			i -= 20
+			p.drawString(100, i, 'Broj warning alarma: '+ str(warAlarms))
+			i -= 20
+			p.drawString(100, i, 'Broj notice alarma: '+ str(ntcAlarms))
+			#p.showPage()
+			p.save()
+			#pdf = buffer.getvalue()
+			buffer.close()
+			#response.write(pdf)
 
 		machines= Machine.objects.all()
 		apps= Log.objects.order_by().values('appname').distinct()
@@ -177,42 +237,37 @@ def predefineReports(request):
 	return render(request, 'logService/predefined.html', {'preports': predefined})
 
 def reportGenerate():
-	timet= datetime.now()
-	neededTime = time.localtime()
-	print("ovo je trenutno vreme")
-	neededTime = strftime('%Y-%m-%dT%H:%M:%S.00%z', neededTime)
-	neededTime = datetime.strptime(neededTime, '%Y-%m-%dT%H:%M:%S.%f%z')
+	timet= timezone.now()
 	try:
 		lst= Report.objects.last()
-		#print(timet)
-		print(neededTime)
-		print("ovo je vreme poslednjeg loga i poslednjeg +12h")
-		plus= lst.timestamp+ timedelta(hours=12)
-		print(lst.timestamp)
-		print(plus)
-		if(lst.timestamp+ timedelta(hours=12)> neededTime):
-			timed=plus- neededTime
-			print("razlika izmedju +12 i trenutnog vremena")
-			print(timed)
+		plus= lst.timestamp+ timedelta(hours= 12)
+		if(plus> timet):
+			timed=plus- timet
 			seconds= timed.total_seconds()
-			print(seconds)
-			print("trenutno -12")
-			print(neededTime-timedelta(hours=12))
-			print(neededTime+timedelta(hours=12)- lst.timestamp + timedelta(hours=12))
-			time.sleep(seconds)
+			tm.sleep(seconds)
 	except:
-		print("u exceptu je")
 		lst= None
 	logs = Log.objects.all()
 	alarms = AlarmLog.objects.all()
-	print(len(alarms.filter(logs__machine__system = 'W')))
 	winLogs= len(logs.filter(machine__system= 'W'))
 	lnxLogs = len(logs.filter(machine__system = 'L'))
 	winAlarms = len(alarms.filter(logs__machine__system = 'W'))
 	lnxAlarms = len(alarms.filter(logs__machine__system = 'L'))
-	time.sleep(10)
-	print("heeeyhooo")
-	report = Report.objects.create(timestamp=datetime.now(), numbOfAllLogs=len(logs), numbOfAllAlarms=len(alarms), numbOfWinLogs=winLogs,
+
+	buffer = BytesIO()
+	time = datetime.now()
+	p = canvas.Canvas("regular/"+str(time.date()) + "-" + str(time.time().hour) + "." + str(time.time().minute)+ "." + str(time.time().second) + ".pdf")
+
+	p.drawString(80, 800, 'Izvestaj za ' + str(time.date()) + ' ' + str(time.time()))
+	p.drawString(80, 760, 'Ukupan broj logova: ' + str(logs))
+	p.drawString(80, 740, 'Ukupan broj alarma: ' + str(alarms))
+	p.drawString(100, 720, 'Broj logova za Windows OS: ' + str(winLogs))
+	p.drawString(100, 700, 'Broj logova za Linux OS: ' + str(lnxLogs))
+	p.drawString(100, 680, 'Broj alarma za Windows OS: ' + str(winAlarms))
+	p.drawString(100,660, 'Broj alarma za Linux OS: ' + str(lnxAlarms))
+	p.save()
+	buffer.close()
+	report = Report.objects.create(timestamp=timezone.now(), numbOfAllLogs=len(logs), numbOfAllAlarms=len(alarms), numbOfWinLogs=winLogs,
 								numbOfLinLogs=lnxLogs, numbOfWinAlarms=winAlarms, numbOfLinAlarms=lnxAlarms)
 	report.save()
 
@@ -224,6 +279,6 @@ def reportGeneratorBeat():
 	while(reportGenerating):
 		reportGenerate()
 		GENERATING_REPORT_TIME=43200
-		time.sleep(GENERATING_REPORT_TIME)
+		tm.sleep(GENERATING_REPORT_TIME)
 
 reportGenerating = True

@@ -4,31 +4,30 @@
         <meta charset="UTF-8">
         <title>Login</title>
         <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+
     </head>
     <body>
-        {% block content %}
         <div class="container">
             <div class="row">
                 <div class="col-sm-6 col-md-4 col-md-offset-4">
                     <h1 class="text-center login-title">Sign in</h1>
                     <div class="account-wall" align="center">
-                        {% if form.errors %}
-                        <p align="center">Your username and password didn't match. Please try again.</p>
-                        {% endif %}
 
-                        {% if next %}
-                            {% if user.is_authenticated %}
-                            <p align="center">Your account doesn't have access to this page. To proceed,
-                            please login with an account that has access.</p>
-                            {% else %}
-                            <p align="center">Please login to see this page.</p>
+                            {% if next %}
+                                {% if user.is_authenticated %}
+                                <p align="center">Your account doesn't have access to this page. To proceed,
+                                please login with an account that has access.</p>
+                                {% else %}
+                                <p align="center">Please login to see this page.</p>
+                                {% endif %}
                             {% endif %}
-                        {% endif %}
-                        <form class="form-signin" method="post" action="{% url 'login' %}">
+                             <p align="center"> {{ errors }}</p>
+
+                        <form class="form-signin" id="forma" name="LoginForm" method="post" action="{% url 'login' %}">
                             {% csrf_token %}
-                            <input class="form-control" id="{{ form.username.id_for_label }}" maxlength="30" placeholder="{{ form.username.html_name }}" name="{{ form.username.html_name }}" required autofocus />
-                            <input class="form-control" id="{{ form.password.id_for_label }}" maxlength="30" placeholder="{{ form.password.html_name }}" name="{{ form.password.html_name }}" type="password" required />
-                            <input type="submit" class="btn btn-primary" value="login" />
+                            <input class="form-control" name="username" id="username" maxlength="30" placeholder="Username" required autofocus />
+                            <input class="form-control" name="password" id="password" maxlength="30" placeholder="Password" type="password" required />
+                            <input type="submit" id="login" name="login" class="btn btn-primary" value="login" />
                             <input type="hidden" name="next" value="{{ next }}" />
                         </form>
                         {# Assumes you setup the password_reset view in your URLconf #}
@@ -37,6 +36,4 @@
                 </div>
             </div>
         </div>
-
-        {% endblock %}
     </body>
