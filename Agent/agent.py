@@ -99,7 +99,7 @@ def main():
 		if len(msg_l)!=0:
 			print("Sent "+str(len(msg_l))+" messages to server")
 			payload={'counter':counter,'facility':facility_l,'severity':severity_l,'version':version_l,'timestamp':timestamp_l,'hostname':hostname_l,'appname':appname_l,'procid':procid_l,'msgid':msgid_l,'structuredData':sdata_l,'msg':msg_l}
-			requests.post(centralAgent,json=payload)
+			requests.post(centralAgent,json=payload,cert=('/Certificate/agentCertificate1.crt', '/Certificate/privateKeyAgent1.key')))
 			counter+=1
 			f = open("config.config","w")
 			print(counter,file=f)
