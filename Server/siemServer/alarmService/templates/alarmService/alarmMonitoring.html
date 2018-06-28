@@ -6,7 +6,7 @@
       <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" />
 	  <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
       <script>
-	     var websocket = new WebSocket("ws://127.0.0.1:6789/");
+	     var websocket = new WebSocket("wss://127.0.0.1:6789/");
 		 websocket.onmessage = function (event) {
 			data = JSON.parse(event.data);
 			$('#allAlarms').find('tr:gt(0)').remove();
@@ -76,10 +76,10 @@
          padding: 15px;">
          <h2 style="display: inline">
          <a href="getLogs" style="text-decoration: none">   Logs   </a></h2>
-         <h2 style="display: inline"><a style="text-decoration: none" href="allAlarms">   Alarms   </a></h2>
+         <h2 style="display: inline"><a style="text-decoration: none" href="allAlarms">   Triggered Alarms   </a></h2>
 		 <h1 style="display: inline">   Alarm Monitoring   </h1>
          {% if perms.alarmService.get_alarm_rules %}
-         <h2 style="display: inline"><a style="text-decoration: none" href="alarmRules">   Alarm Rules   </a></h2>
+         <h2 style="display: inline"><a style="text-decoration: none" href="alarmRules">   Alarm Triggering Rules   </a></h2>
          {% endif %}
            <h2 style="display: inline"><a href="/api/report" style="text-decoration: none">Report</a></h2>
          <a href="/accounts/logout" class="btn btn-primary" role="button" style="float: right;">Logout</a>

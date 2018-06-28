@@ -164,10 +164,10 @@
          color: white;
          padding: 15px;">
 		<h2 style="display: inline"><a href="getLogs" style="text-decoration: none"> Logs</a></h2>
-		<h2 style="display: inline"> <a href="allAlarms" style="text-decoration: none">Alarms</a></h2>
+		<h2 style="display: inline"> <a href="allAlarms" style="text-decoration: none"> Triggered Alarms </a></h2>
         <h2 style="display: inline"><a href="alarmMonitoring" style="text-decoration:none">   Alarm Monitoring   </a></h2>
 		{% if perms.alarmService.get_alarm_rules %}
-		<h2 style="display: inline"><a href="alarmRules">Alarm Rules</a></h2>
+		<h2 style="display: inline"><a href="alarmRules"> Alarm Triggering Rules </a></h2>
 		{% endif %}
 		<h1 style="display: inline">Report</h1>
         <a href="/accounts/logout" class="btn btn-primary" role="button" style="float: right;">Logout</a>

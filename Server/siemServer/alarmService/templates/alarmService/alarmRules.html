@@ -34,10 +34,10 @@
       color: white;
       padding: 15px;">
          <h2 style="display: inline"><a style="text-decoration: none" href="getLogs">   Logs   </a></h2>
-         <h2 style="display: inline"><a style="text-decoration: none" href="allAlarms">   Alarms   </a></h2>
+         <h2 style="display: inline"><a style="text-decoration: none" href="allAlarms">   Triggered Alarms   </a></h2>
 		 <h2 style="display: inline"><a href="alarmMonitoring" style="text-decoration:none">   Alarm Monitoring   </a></h2>
          {% if perms.alarmService.get_alarm_rules %}
-         <h1 style="display: inline">   Alarm Rules   </h1>
+         <h1 style="display: inline">   Alarm Triggering Rules   </h1>
          {% endif %}
          <h2 style="display: inline"><a href="/api/report" style="text-decoration: none">Report</a></h2>
          <a href="/accounts/logout" class="btn btn-primary" role="button" style="float: right;">Logout</a>
@@ -102,37 +102,19 @@
             <div class="col-sm-9 table-responsive" style="padding-left:0;padding-right:0">
                <table class="table table-striped">
                   <tr class="thead-dark">
-                     <th>Facility regex</th>
-					 <th>Severity regex</th>
-					 <th>Hostname regex</th>
-					 <th>Appname regex</th>
-					 <th>Message id regex</th>
-                     <th>System specified</th>
-                     <th>Machine specified</th>
-                     <th>Application specific</th>
-                     <th>Unique message ID specific</th>
+                     <th>About Alarm</th>
+
                      <th>Type</th>
-                     <th>Repeat</th>
-                     
-                     <th>Minutes</th>
+
                      <th>Active</th>
 					 <th>Edit</th>
                   </tr>
                   {% for alarm in alarmrules %}
                   <tr>
-                     <td>{{ alarm.regfacility }}</td>
-					 <td>{{ alarm.regseverity }}</td>
-					 <td>{{ alarm.reghostname }}</td>
-					 <td>{{ alarm.regappname }}</td>
-					 <td>{{ alarm.regmsgid }}</td>
-                     <td>{{ alarm.sysspec }}</td>
-                     <td>{{ alarm.machinespec }}</td>
-                     <td>{{ alarm.appspec }}</td>
-                     <td>{{ alarm.rmispec }}</td>
+                     <td>{{ alarm.text }}</td>
+
                      <td>{{ alarm.type }}</td>
-                     <td>{{ alarm.repeat }}</td>
-                     
-                     <td>{{ alarm.minutes }}</td>
+
                      <td>{{ alarm.active }}</td>
 					 <td>
 						 <form action="editAlarmRules" method="get">
