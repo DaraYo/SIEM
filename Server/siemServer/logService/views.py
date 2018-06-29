@@ -10,6 +10,8 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import inch
 from io import BytesIO
 from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.units import inch, cm
 
 from datetime import datetime, timedelta
 import re
@@ -171,31 +173,31 @@ def report(request):
 			#response['Content-Disposition'] = 'inline; filename="'+datetime.now()+'.pdf"'
 			buffer = BytesIO()
 			time= datetime.now()
-			p = canvas.Canvas("predefined/"+str(time.date())+"-"+str(time.time().hour)+"."+str(time.time().minute)+ "." + str(time.time().second)+"_predefined.pdf")
-			p.drawCentredString(80, 800, 'Izvestaj za '+str(time.date())+' '+str(time.time()))
-			p.drawString(80, 740, 'Odabrane masine:')
-			i= 740
-			if len(selectedMac)==0:
-				i-=20
-				p.drawString(300, i, '/')
-			else:
+			p = canvas.Canvas("predefined/"+str(time.date())+"-"+str(time.time().hour)+"."+str(time.time().minute)+ "." + str(time.time().second)+"_predefined.pdf", pagesize=letter)
+			p.setFont("Times-Roman", 22)
+			width, height = letter
+			p.drawString(width-230, height-70, 'Izvestaj za '+str(time.date()))
+			p.setFont("Times-Roman", 16)
+			p.drawString(width-255, height-88, str(time.time()))
+			p.setFont("Times-Roman", 14)
+			i= 500
+			if len(selectedMac)!=0:
+				p.drawString(80, i, 'Odabrane masine:')
 				for n in selectedMac:
 					i-=20
 					p.drawString(120, i, str(n))
 			i-=40
-			p.drawString(80, i, 'Odabrane aplikacije:')
-			if len(selectedA) == 0:
-				i -= 20
-				p.drawString(300, i, '/')
-			else:
+
+			if len(selectedA) != 0:
+				p.drawString(80, i, 'Odabrane aplikacije:')
 				for l in selectedA:
 					i -= 20
 					p.drawString(120, i, str(l))
 
 			i-=40
-			p.drawString(80, i, 'Za operativni sistem:')
+			p.drawString(80, i, 'Operativni sistem:'+ winCB+ ","+ linCB)
 			i -= 20
-			p.drawString(80, i, 'Za period '+ str(timestampF)+" - "+str(timestampT))
+			p.drawString(80, i, 'Izgenerisano za period '+ str(timestampF)+" - "+str(timestampT))
 			i-= 20
 			p.drawString(100, i, 'Ukupan broj logova: '+ str(nForMach))
 			i -= 20
@@ -247,28 +249,32 @@ def reportGenerate():
 			tm.sleep(seconds)
 	except:
 		lst= None
-	logs = Log.objects.all()
-	alarms = AlarmLog.objects.all()
+	logs = Log.objects.filter(timestamp__range=(lst.timestamp, timet))
+	alarms = AlarmLog.objects.filter(time__range=(lst.timestamp, timet))
 	winLogs= len(logs.filter(machine__system= 'W'))
 	lnxLogs = len(logs.filter(machine__system = 'L'))
 	winAlarms = len(alarms.filter(logs__machine__system = 'W'))
 	lnxAlarms = len(alarms.filter(logs__machine__system = 'L'))
-
 	buffer = BytesIO()
 	time = datetime.now()
-	p = canvas.Canvas("regular/"+str(time.date()) + "-" + str(time.time().hour) + "." + str(time.time().minute)+ "." + str(time.time().second) + ".pdf")
-
-	p.drawString(80, 800, 'Izvestaj za ' + str(time.date()) + ' ' + str(time.time()))
-	p.drawString(80, 760, 'Ukupan broj logova: ' + str(logs))
-	p.drawString(80, 740, 'Ukupan broj alarma: ' + str(alarms))
-	p.drawString(100, 720, 'Broj logova za Windows OS: ' + str(winLogs))
-	p.drawString(100, 700, 'Broj logova za Linux OS: ' + str(lnxLogs))
-	p.drawString(100, 680, 'Broj alarma za Windows OS: ' + str(winAlarms))
-	p.drawString(100,660, 'Broj alarma za Linux OS: ' + str(lnxAlarms))
+	p = canvas.Canvas("regular/"+str(time.date()) + "-" + str(time.time().hour) + "." + str(time.time().minute)+ "." + str(time.time().second) + ".pdf", pagesize=letter)
+	p.setFont("Times-Roman", 22)
+	width, height = letter
+	p.drawString(230, height-70, 'Izvestaj za vremenski raspon')
+	p.setFont("Times-Roman", 16)
+	p.drawString(230, height - 88, lst.timestamp+"-"+time)
+	p.setFont("Times-Roman", 14)
+	p.drawString(80, 500, 'Ukupan broj logova: ' + str(len(logs)))
+	p.drawString(80, 480, 'Ukupan broj alarma: ' + str(len(alarms)))
+	p.drawString(80, 460, 'Broj logova za Windows OS: ' + str(winLogs))
+	p.drawString(80, 440, 'Broj logova za Linux OS: ' + str(lnxLogs))
+	p.drawString(80, 420, 'Broj alarma za Windows OS: ' + str(winAlarms))
+	p.drawString(80,400, 'Broj alarma za Linux OS: ' + str(lnxAlarms))
 	p.save()
 	buffer.close()
 	report = Report.objects.create(timestamp=timezone.now(), numbOfAllLogs=len(logs), numbOfAllAlarms=len(alarms), numbOfWinLogs=winLogs,
 								numbOfLinLogs=lnxLogs, numbOfWinAlarms=winAlarms, numbOfLinAlarms=lnxAlarms)
+
 	report.save()
 
 def reportGeneratorRunner():
